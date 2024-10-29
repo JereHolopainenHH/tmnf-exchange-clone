@@ -33,7 +33,11 @@ public class AppUser {
 
     @ManyToMany
     @NotNull(message = "Role is required")
-    @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+    @JoinTable(
+        name = "user_role", 
+        joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+        inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id")
+    )
     private Set<Role> roles; // User roles
 
     @OneToMany(mappedBy = "user")
