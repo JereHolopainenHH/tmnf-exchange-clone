@@ -13,7 +13,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public class Comment {
-    // Comment(id, commentText, User<userId>, postedAt, Track<trackId>)
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +26,7 @@ public class Comment {
     private LocalDateTime postedAt; // Time when the comment was posted
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     @NotNull(message = "User is required")
     private AppUser user; // User who posted the comment
     
