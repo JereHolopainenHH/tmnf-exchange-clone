@@ -27,7 +27,7 @@ public class AppUser {
     @NotBlank(message = "Password is required")
     @Size(min = 8, message = "Password must be at least 8 characters long")
     @Pattern(regexp = "^[a-zA-Z0-9]*$", message = "Password must contain only letters and numbers")
-    private String password; // Password, min 8 characters, only letters and numbers
+    private String passwordHash; // Password, min 8 characters, only letters and numbers
 
     private String tmnfLogin; // Trackmania Nations Forever login, used to confirm the author of the track/replay
 
@@ -49,9 +49,9 @@ public class AppUser {
     public AppUser() {
     }
 
-    public AppUser(String username, String password, String tmnfLogin, Set<Role> roles) {
+    public AppUser(String username, String passwordHash, String tmnfLogin, Set<Role> roles) {
         this.username = username;
-        this.password = password;
+        this.passwordHash = passwordHash;
         this.tmnfLogin = tmnfLogin;
         this.roles = roles;
     }
@@ -73,12 +73,12 @@ public class AppUser {
         this.username = username;
     }
 
-    public String getPassword() {
-        return password;
+    public String getPasswordHash() {
+        return passwordHash;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
     }
 
     public String getTmnfLogin() {
