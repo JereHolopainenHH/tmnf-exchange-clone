@@ -25,12 +25,12 @@ public class Replay {
 
     @ManyToOne
     @JoinColumn(name = "track_id", referencedColumnName = "id")
-    @NotNull(message = "Replay need's to be associated with a track")
+    @NotNull(message = "Replay needs to be associated with a track")
     private Track track;
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
-    @NotNull(message = "Replay need's to be associated with a user")
+    @NotNull(message = "Replay needs to be associated with a user")
     private AppUser user;
 
     // Constructors

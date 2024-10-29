@@ -18,7 +18,7 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // Primary key
 
-    @NotBlank(message = "Comment text required")
+    @NotBlank(message = "Comment needs to have text content")
     @Size(max = 500, message = "Comment text must be at most 500 characters long")
     private String commentText; // Comment text
 
@@ -27,12 +27,12 @@ public class Comment {
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
-    @NotNull(message = "User is required")
+    @NotNull(message = "Comment is required to be associated with a user")
     private AppUser user; // User who posted the comment
     
     @ManyToOne
-    @JoinColumn(name = "track_id")
-    @NotNull(message = "Track is required")
+    @JoinColumn(name = "track_id", referencedColumnName = "id")
+    @NotNull(message = "Comment is required to be associated with a track")
     private Track track; // Track the comment is posted on
 
     // Constructors
