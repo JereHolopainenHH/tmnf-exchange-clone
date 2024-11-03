@@ -1,7 +1,9 @@
-package fi.jereholopainen.tmnf_exchange_clone.entity;
+package fi.jereholopainen.tmnf_exchange_clone.model;
 
 import java.util.List;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -11,6 +13,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+@Entity
 public class Track {
 
    // Track(id, name, description, uid, filePath, User<userId>, List<Comment>, List<Replay>)
@@ -25,6 +28,7 @@ public class Track {
     private String description; // Track description
 
     @NotBlank(message = "Track uid is required")
+    @Column(unique = true)
     private String uid; // Track uid
 
     @NotBlank(message = "Track filepath is required")

@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import org.springframework.data.repository.CrudRepository;
 
-import fi.jereholopainen.tmnf_exchange_clone.entity.AppUser;
+import fi.jereholopainen.tmnf_exchange_clone.model.AppUser;
 
 public interface AppUserRepository extends CrudRepository<AppUser, Long> {
     Optional<AppUser> findByUsername(String username);

@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.springframework.data.repository.CrudRepository;
 
-import fi.jereholopainen.tmnf_exchange_clone.entity.AppUser;
-import fi.jereholopainen.tmnf_exchange_clone.entity.Track;
-import fi.jereholopainen.tmnf_exchange_clone.entity.Replay;
+import fi.jereholopainen.tmnf_exchange_clone.model.AppUser;
+import fi.jereholopainen.tmnf_exchange_clone.model.Replay;
+import fi.jereholopainen.tmnf_exchange_clone.model.Track;
 
 public interface ReplayRepository extends CrudRepository<Replay, Long>{
     List<Replay> findByTrack(Track track);
