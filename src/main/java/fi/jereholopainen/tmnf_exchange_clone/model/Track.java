@@ -31,6 +31,9 @@ public class Track {
     @Column(unique = true)
     private String uid; // Track uid
 
+    @NotBlank(message = "Track author is required")
+    private String author;
+
     @NotBlank(message = "Track filepath is required")
     private String filePath; // Track filepath
 
@@ -49,15 +52,16 @@ public class Track {
     public Track() {
     }
 
-    public Track(String name, String description, String uid, String filePath, AppUser user) {
+    public Track(String name, String description, String uid, String author, String filePath, AppUser user) {
         this.name = name;
         this.description = description;
         this.uid = uid;
+        this.author = author;
         this.filePath = filePath;
         this.user = user;
     }
 
-    // Getters and setters
+    // getters and setters
     public Long getId() {
         return id;
     }
@@ -88,6 +92,14 @@ public class Track {
 
     public void setUid(String uid) {
         this.uid = uid;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
     }
 
     public String getFilePath() {
@@ -122,5 +134,8 @@ public class Track {
         this.replays = replays;
     }
 
+    
+
+    
     
 }

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>hello</h1>
+    <!-- Displaying the logged-in user's name -->
+    <div sec:authorize="isAuthenticated()">
+        <p>Hello, <span th:text="${#authentication.principal.username}"></span>!</p>
+        <p>Start <a th:href="@{/tracks/upload}">uploading tracks</a> now!</p>
+        <a th:href="@{/logout}">Logout</a>
+    </div>
+
+    <div sec:authorize="!isAuthenticated()">
+        <p>Please log in.</p>
+        <a th:href="@{/login}">Login</a>
+    </div>
+
+</body>
+
+</html>

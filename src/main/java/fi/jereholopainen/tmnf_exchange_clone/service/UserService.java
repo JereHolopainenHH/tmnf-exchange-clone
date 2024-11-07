@@ -1,11 +1,12 @@
 package fi.jereholopainen.tmnf_exchange_clone.service;
 
-import org.springframework.stereotype.Service;
+import java.util.Optional;
 
 import fi.jereholopainen.tmnf_exchange_clone.model.AppUser;
 
-@Service
 public interface UserService {
     void save(AppUser user);
-    AppUser findByUsername(String username);
+    Optional<AppUser> findByUsername(String username);
+    Optional<AppUser> findByTmnfLogin(String tmnfLogin);
+    void updateTmnfLogin(String username, String tmnfLogin);
 }

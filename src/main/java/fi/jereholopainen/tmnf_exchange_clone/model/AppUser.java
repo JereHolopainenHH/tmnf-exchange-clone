@@ -2,6 +2,7 @@ package fi.jereholopainen.tmnf_exchange_clone.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -11,7 +12,6 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 import java.util.HashSet;
@@ -27,6 +27,7 @@ public class AppUser {
 
     @NotBlank(message = "Username is required")
     @Column(unique = true)
+    @Size(min = 3, max = 20, message = "Username must be between 3 and 20 characters long")
     private String username; // Username
 
     @NotBlank(message = "Password is required")
@@ -36,7 +37,7 @@ public class AppUser {
     @Column(unique = true)
     private String tmnfLogin; // Trackmania Nations Forever login, used to confirm the author of the track/replay
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @NotNull(message = "Role is required")
     @JoinTable(
         name = "user_role", 

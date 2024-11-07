@@ -13,14 +13,19 @@ public class RegistrationRequest {
     @Size(min = 8, message = "Password must be at least 8 characters long")
     private String password;
 
+    @NotBlank(message = "Confirm Password is required")
+    @Size(min = 8, message = "Confirm Password must be at least 8 characters long")
+    private String confirmPassword;
+
     // Default constructor
     public RegistrationRequest() {
     }
 
     // Constructor with parameters
-    public RegistrationRequest(String username, String password) {
+    public RegistrationRequest(String username, String password, String confirmPassword) {
         this.username = username;
         this.password = password;
+        this.confirmPassword = confirmPassword;
     }
 
     // Getters and setters
@@ -39,4 +44,13 @@ public class RegistrationRequest {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    public String getConfirmPassword() {
+        return confirmPassword;
+    }
+
+    public void setConfirmPassword(String confirmPassword) {
+        this.confirmPassword = confirmPassword;
+    }
+
 }
