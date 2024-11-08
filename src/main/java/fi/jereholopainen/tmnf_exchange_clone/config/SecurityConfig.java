@@ -32,29 +32,27 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/h2-console/**").permitAll()
-                .requestMatchers("/home").permitAll()
-                .requestMatchers("/upload").authenticated()
-                .requestMatchers("/profile").authenticated()
-                .requestMatchers("/register", "/login").anonymous()
-                        .anyRequest().authenticated())
-                .formLogin(formLogin -> formLogin
-                        .loginPage("/login")
-                        .loginProcessingUrl("/login")
-                        .defaultSuccessUrl("/home")
-                        .failureUrl("/login?error=true"))
-                .logout(logout -> logout
-                        .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-                        .permitAll())
-                .exceptionHandling(exceptionHandling -> exceptionHandling
-                        .accessDeniedPage("/home"))
-                        
-                .headers(headers -> headers.frameOptions(FrameOptionsConfig::disable));
+            .authorizeHttpRequests(authorize -> authorize
+                // Allow unauthenticated access to these routes
+                .requestMatchers("/h2-console/**").permitAll()  
+                .requestMatchers("/**").permitAll()  
+                // Restrict access to authenticated users for other routes
+                .requestMatchers("/upload", "/profile").authenticated()  
+                .anyRequest().authenticated())  // Protect all other requests
+            .formLogin(formLogin -> formLogin
+                .loginPage("/login")  // Custom login page
+                .loginProcessingUrl("/login")  // URL for processing login
+                .defaultSuccessUrl("/home", true)  // Redirect to /home after login
+                .failureUrl("/login?error=true"))  // Redirect to login on failure
+            .logout(logout -> logout
+                .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+                .permitAll())  // Allow logout for everyone
+            .exceptionHandling(exceptionHandling -> exceptionHandling
+                .accessDeniedPage("/home"))  // Redirect to /home on access denied
+            .headers(headers -> headers.frameOptions(FrameOptionsConfig::disable));  // Disable for H2 console if needed
 
         return http.build();
     }
-
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         auth

@@ -8,6 +8,7 @@
 </head>
 
 <body>
+    <nav th:replace="~{fragments/navbar :: navbar}"></nav>
     <h1>hello</h1>
     <!-- Displaying the logged-in user's name -->
     <div sec:authorize="isAuthenticated()">

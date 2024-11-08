@@ -1,5 +1,6 @@
 package fi.jereholopainen.tmnf_exchange_clone.web.controller;
 
+import java.lang.ProcessBuilder.Redirect;
 import java.util.Optional;
 
 import org.springframework.security.core.Authentication;
@@ -10,7 +11,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import fi.jereholopainen.tmnf_exchange_clone.exception.UserNotFoundException;
 import fi.jereholopainen.tmnf_exchange_clone.model.AppUser;
 import fi.jereholopainen.tmnf_exchange_clone.service.UserService;
 
@@ -26,28 +29,30 @@ public class UserProfileController {
 
     @GetMapping
     public String showProfileForm(Model model) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        Optional<AppUser> user = userService.findByUsername(username);
-        if (!user.isPresent()) {
-            throw new RuntimeException("User not found");
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String username = authentication.getName();
+            AppUser user = userService.findByUsername(username);
+            model.addAttribute("user", user);
+        } catch (UserNotFoundException e) {
+            model.addAttribute("error", e.getMessage());
         }
-        model.addAttribute("user", user.get());
         return "profile";
     }
 
     @PostMapping("/update")
-    public String updateProfile(@ModelAttribute AppUser user) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        Optional<AppUser> optionalUser = userService.findByUsername(username);
-        if (!optionalUser.isPresent()) {
-            throw new RuntimeException("User not found");
+    public String updateProfile(@ModelAttribute AppUser user, RedirectAttributes redirectAttributes) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String username = authentication.getName();
+            AppUser userToUpdate = userService.findByUsername(username);
+            userToUpdate.setTmnfLogin(user.getTmnfLogin());
+            userService.updateTmnfLogin(userToUpdate.getUsername(), userToUpdate.getTmnfLogin());
+            redirectAttributes.addFlashAttribute("success", "Profile updated successfully");
+        } catch (UserNotFoundException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
 
-        AppUser existingUser = optionalUser.get();
-        existingUser.setTmnfLogin(user.getTmnfLogin());
-        userService.updateTmnfLogin(existingUser.getUsername(), existingUser.getTmnfLogin());
         return "redirect:/tracks/upload";
     }
 

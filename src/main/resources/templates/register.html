@@ -8,6 +8,7 @@
 </head>
 
 <body>
+    <nav th:replace="~{fragments/navbar :: navbar}"></nav>
     <h1>Register</h1>
     <form method="post" th:action="@{/register}" th:object="${registrationRequest}">
         <label for="username">Username:</label>

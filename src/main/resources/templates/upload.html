@@ -5,23 +5,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upload Track</title>
+    <script th:src="@{/js/readFile.js}"></script>
 </head>
 
 <body>
+    <nav th:replace="~{fragments/navbar :: navbar}"></nav>
     <h1>Upload Track</h1>
+    <p th:if="${error}" th:text="${error}" style="color: red;"></p>
+    <p th:if="${success}" th:text="${success}" style="color: green;"></p>
     <form method="post" enctype="multipart/form-data" th:action="@{/tracks/upload}">
         <label for="file">Choose file:</label>
         <input type="file" id="file" name="file" required>
-        <br>
+        <div id="file-info"></div>
         <button type="submit">Upload</button>
     </form>
-
-    <div th:if="${message}">
-        <p th:text="${message}" style="color: green;"></p>
-    </div>
-    <div th:if="${error}">
-        <p th:text="${error}" style="color: red;"></p>
-    </div>
 </body>
 
 </html>

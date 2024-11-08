@@ -8,6 +8,7 @@ import fi.jereholopainen.tmnf_exchange_clone.service.UserService;
 import fi.jereholopainen.tmnf_exchange_clone.web.dto.RegistrationRequest;
 import jakarta.validation.Valid;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +24,10 @@ public class AuthController {
     }
 
     @GetMapping("/login")
-    public String login(@RequestParam(value = "message", required = false) String message, Model model) {
+    public String login(@RequestParam(value = "message", required = false) String message, Model model, Authentication authentication) {
+        if(authentication != null && authentication.isAuthenticated()) {
+            return "redirect:/home";
+        }
         if(message != null) {
             model.addAttribute("message", message);
         }
@@ -31,7 +35,10 @@ public class AuthController {
     }
 
     @GetMapping("/register")
-    public String register(Model model) {
+    public String register(Model model, Authentication authentication) {
+        if(authentication != null && authentication.isAuthenticated()) {
+            return "redirect:/home";
+        }
         model.addAttribute("registrationRequest", new RegistrationRequest());
         return "register";
     }

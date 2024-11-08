@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tracks</title>
+</head>
+<body>
+    <nav th:replace="~{fragments/navbar :: navbar}"></nav>
+    <h1 th:if="${username}" th:text="'Tracks for ' + ${username}">Tracks</h1>
+    <h1 th:if="${username == null}">Tracks</h1>
+    <tbody>
+        <tr th:each="track : ${tracks}">
+            <td th:text="${track.name}"></td>
+            <td th:text="${track.author}"></td>
+            <td th:text="${track.uid}"></td>
+            <td th:text="${track.filePath}"></td>
+        </tr>
+    </tbody>
+</body>
+</html>

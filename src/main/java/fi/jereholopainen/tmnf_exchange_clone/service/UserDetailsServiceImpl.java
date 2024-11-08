@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import fi.jereholopainen.tmnf_exchange_clone.exception.UserNotFoundException;
 import fi.jereholopainen.tmnf_exchange_clone.model.AppUser;
 import fi.jereholopainen.tmnf_exchange_clone.model.Role;
 
@@ -25,13 +26,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<AppUser> user = userService.findByUsername(username);
-        if (user.isEmpty()) {
-            throw new UsernameNotFoundException("Invalid username or password.");
+        try {
+            AppUser user = userService.findByUsername(username);
+            return new org.springframework.security.core.userdetails.User(user.getUsername(),
+                    user.getPasswordHash(),
+                    mapRolesToAuthorities(user.getRoles()));
+        } catch (UserNotFoundException e) {
+            throw new UsernameNotFoundException("User not found with username: " + username);
         }
-        return new org.springframework.security.core.userdetails.User(user.get().getUsername(),
-                user.get().getPasswordHash(),
-                mapRolesToAuthorities(user.get().getRoles()));
     }
 
     private Collection<? extends GrantedAuthority> mapRolesToAuthorities(Collection<Role> roles) {

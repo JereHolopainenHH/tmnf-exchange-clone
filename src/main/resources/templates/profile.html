@@ -8,6 +8,7 @@
 </head>
 
 <body>
+    <nav th:replace="~{fragments/navbar :: navbar}"></nav>
     <h1>Profile Management</h1>
     <div th:if="${error}">
         <p th:text="${error}" style="color: red;"></p>

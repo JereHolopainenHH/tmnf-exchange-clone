@@ -12,7 +12,6 @@ import fi.jereholopainen.tmnf_exchange_clone.model.AppUser;
 import fi.jereholopainen.tmnf_exchange_clone.model.Role;
 import fi.jereholopainen.tmnf_exchange_clone.repository.AppUserRepository;
 import fi.jereholopainen.tmnf_exchange_clone.repository.RoleRepository;
-import io.github.cdimascio.dotenv.Dotenv;
 
 @Component
 public class DataInitializer implements CommandLineRunner {
@@ -22,7 +21,11 @@ public class DataInitializer implements CommandLineRunner {
     private final AppUserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public DataInitializer(RoleRepository roleRepository, AppUserRepository userRepository, PasswordEncoder passwordEncoder) {
+    private static final String ADMIN_ROLE = "ADMIN";
+    private static final String USER_ROLE = "USER";
+
+    public DataInitializer(RoleRepository roleRepository, AppUserRepository userRepository,
+            PasswordEncoder passwordEncoder) {
         this.roleRepository = roleRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -30,28 +33,41 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+
         logger.info("Initializing data");
 
-        Role adminRole = roleRepository.save(new Role("ADMIN"));
-        logger.info("Created role: {}", adminRole.getName());
+        // Check if admin role already exists
+        if (roleRepository.findByName(ADMIN_ROLE).isEmpty()) {
+            Role adminRole = roleRepository.save(new Role(ADMIN_ROLE));
+            logger.info("Created role: {}", adminRole.getName());
+        }
 
-        Role userRole = roleRepository.save(new Role("USER"));
-        logger.info("Created role: {}", userRole.getName());
-        
-        Dotenv dotenv = Dotenv.load();
-        String adminPassword = dotenv.get("ADMIN_PASSWORD");
+        // Check if user role already exists
+        if (roleRepository.findByName(USER_ROLE).isEmpty()) {
+            Role userRole = roleRepository.save(new Role(USER_ROLE));
+            logger.info("Created role: {}", userRole.getName());
+        }
 
-        AppUser admin = new AppUser("admin", passwordEncoder.encode(adminPassword), null, Set.of(adminRole, userRole));
-        logger.info("Created user: {}", admin.getUsername());
+        // Check if admin user already exists
+        if (userRepository.findByUsername("admin").isEmpty()) {
+            String adminPassword = System.getenv("ADMIN_PASSWORD"); // Directly get the environment variable
+            logger.info("Admin password: {}", adminPassword);
 
-        userRepository.save(admin);
-        logger.info("Data initialized");
+            if (adminPassword != null) {
+                Role adminRole = roleRepository.findByName(ADMIN_ROLE).orElseThrow();
+                Role userRole = roleRepository.findByName(USER_ROLE).orElseThrow();
 
-        AppUser user = new AppUser("user", passwordEncoder.encode("salasana"), null, Set.of(userRole));
-        logger.info("Created user: {}", user.getUsername());
-
-        userRepository.save(user);
-        
+                AppUser admin = new AppUser("admin", passwordEncoder.encode(adminPassword), null,
+                        Set.of(adminRole, userRole));
+                userRepository.save(admin);
+                logger.info("Created user: {}", admin.getUsername());
+            } else {
+                logger.warn("Admin password not set. Skipping admin user creation.");
+            }
+        }else {
+            logger.info("Admin user already exists, skipping creation.");
+        }
+        logger.info("Data initialization complete");
     }
 
 }
