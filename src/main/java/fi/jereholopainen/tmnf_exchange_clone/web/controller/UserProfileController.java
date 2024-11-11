@@ -136,5 +136,4 @@ public class UserProfileController {
         redirectAttributes.addFlashAttribute("successes", successList);
         return "redirect:/profile";
     }
-
 }

@@ -36,6 +36,7 @@ public class SecurityConfig {
                 http.csrf(csrf -> csrf.disable())
                                 .authorizeHttpRequests(authorize -> authorize
                                                 // Allow unauthenticated access to these routes
+                                                .requestMatchers("/admin/**").hasAuthority("ADMIN")
                                                 .requestMatchers("/", "/home", "/login", "/register", "/tracks/**")
                                                 .permitAll()
                                                 .anyRequest().authenticated()) // Protect all other requests

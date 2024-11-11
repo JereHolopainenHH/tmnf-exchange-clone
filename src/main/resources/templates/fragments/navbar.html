@@ -36,6 +36,7 @@
                             <i class="fa-solid fa-user"></i> <span th:text="${#authentication.name}"></span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdown">
+                            <li sec:authorize="hasAuthority('ADMIN')"><a class="dropdown-item" th:href="@{/admin}">Admin Page</a></li>
                             <li><a class="dropdown-item" href="#" th:href="@{/profile}">My Profile</a></li>
                             <li><a class="dropdown-item" href="#"
                                     th:href="@{/tracks(author=${#authentication.name})}">My Tracks</a></li>
