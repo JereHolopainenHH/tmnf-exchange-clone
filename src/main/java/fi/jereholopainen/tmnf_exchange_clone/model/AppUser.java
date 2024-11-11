@@ -35,15 +35,12 @@ public class AppUser {
     private String passwordHash; // Password, min 8 characters, only letters and numbers
 
     @Column(unique = true)
-    private String tmnfLogin; // Trackmania Nations Forever login, used to confirm the author of the track/replay
+    private String tmnfLogin; // Trackmania Nations Forever login, used to confirm the author of the
+                              // track/replay
 
     @ManyToMany(fetch = FetchType.EAGER)
     @NotNull(message = "Role is required")
-    @JoinTable(
-        name = "user_role", 
-        joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
-        inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id")
-    )
+    @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
     private Set<Role> roles = new HashSet<>(); // User roles
 
     @OneToMany(mappedBy = "user")
@@ -54,6 +51,9 @@ public class AppUser {
 
     @OneToMany(mappedBy = "user")
     private List<Comment> comments; // User's comments
+
+    @OneToMany(mappedBy = "user")
+    private Set<Award> awards; // User's awards
 
     // Constructors
     public AppUser() {
@@ -66,7 +66,6 @@ public class AppUser {
         this.roles = roles;
     }
 
-    // Getters and setters
     public Long getId() {
         return id;
     }
@@ -129,6 +128,14 @@ public class AppUser {
 
     public void setComments(List<Comment> comments) {
         this.comments = comments;
+    }
+
+    public Set<Award> getAwards() {
+        return awards;
+    }
+
+    public void setAwards(Set<Award> awards) {
+        this.awards = awards;
     }
 
 }

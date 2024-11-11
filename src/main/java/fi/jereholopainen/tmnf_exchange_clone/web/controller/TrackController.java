@@ -19,6 +19,7 @@ import fi.jereholopainen.tmnf_exchange_clone.exception.TrackNotFoundException;
 import fi.jereholopainen.tmnf_exchange_clone.exception.UserNotFoundException;
 import fi.jereholopainen.tmnf_exchange_clone.model.AppUser;
 import fi.jereholopainen.tmnf_exchange_clone.model.Track;
+import fi.jereholopainen.tmnf_exchange_clone.service.AwardService;
 import fi.jereholopainen.tmnf_exchange_clone.service.TrackService;
 import fi.jereholopainen.tmnf_exchange_clone.service.UserService;
 import fi.jereholopainen.tmnf_exchange_clone.web.dto.TrackUploadRequest;
@@ -31,7 +32,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -41,10 +41,12 @@ public class TrackController {
 
     private final TrackService trackService;
     private final UserService userService;
+    private final AwardService awardService;
 
-    public TrackController(TrackService trackService, UserService userService) {
+    public TrackController(TrackService trackService, UserService userService, AwardService awardService) {
         this.trackService = trackService;
         this.userService = userService;
+        this.awardService = awardService;
     }
 
     @GetMapping("/trackupload")
@@ -118,5 +120,18 @@ public class TrackController {
             return "redirect:/tracks";
         }
         return "track";
+    }
+
+    @PostMapping("/tracks/{id}/award")
+    public String awardTrack(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        AppUser user = userService.findByUsername(auth.getName());
+        try {
+            awardService.giveAward(user, id);
+            redirectAttributes.addFlashAttribute("successes", "Track awarded successfully.");
+        } catch (TrackNotFoundException e) {
+            redirectAttributes.addFlashAttribute("errors", e.getMessage());
+        }
+        return "redirect:/tracks/" + id;
     }
 }

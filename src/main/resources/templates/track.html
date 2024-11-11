@@ -3,17 +3,13 @@
 
 <body>
     <div th:fragment="content">
-        <h1 th:text="${track.name}">Tracks</h1>
-        <tbody>
-            <tr>
-                <td th:text="${track.name}"></td>
-                <td th:text="${track.author}"></td>
-                <td th:text="${track.uid}"></td>
-                <td th:text="${track.filePath}"></td>
-                <td th:text="${track.createdAt}"></td>
-                <td th:text="${track.awards}"></td>
-            </tr>
-        </tbody>
+        <div class="d-flex my-2">
+            <h1 class="flex-grow-1" th:text="${track.name}">Tracks</h1>
+            <button id="award-btn" type="button" class="btn btn-primary" th:data-track-id="${track.id}">
+                <i class="fa-solid fa-trophy" style="color: gold;"></i> Award
+            </button>
+        </div>
+        <table th:replace="~{fragments/track-table :: table(${track})}"></table>
     </div>
 </body>
 

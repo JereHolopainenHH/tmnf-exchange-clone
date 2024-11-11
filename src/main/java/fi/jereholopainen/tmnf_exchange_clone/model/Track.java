@@ -2,6 +2,7 @@ package fi.jereholopainen.tmnf_exchange_clone.model;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -50,8 +51,6 @@ public class Track {
 
     private LocalDateTime createdAt = LocalDateTime.now(); // Track creation date
 
-    private Integer awards = 0; // Track awards
-
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @NotNull(message = "Track needs to be associated with a user")
@@ -62,6 +61,9 @@ public class Track {
 
     @OneToMany(mappedBy = "track")
     private List<Replay> replays; // Replays for the track
+
+    @OneToMany(mappedBy = "track")
+    private Set<Award> awards;
 
     public Track() {
     }
@@ -163,14 +165,6 @@ public class Track {
         this.createdAt = createdAt;
     }
 
-    public Integer getAwards() {
-        return awards;
-    }
-
-    public void setAwards(Integer awards) {
-        this.awards = awards;
-    }
-
     public AppUser getUser() {
         return user;
     }
@@ -193,6 +187,14 @@ public class Track {
 
     public void setReplays(List<Replay> replays) {
         this.replays = replays;
+    }
+
+    public Set<Award> getAwards() {
+        return awards;
+    }
+
+    public void setAwards(Set<Award> awards) {
+        this.awards = awards;
     }
 
 }

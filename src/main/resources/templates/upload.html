@@ -7,12 +7,14 @@
             <h1 class="mb-4">Upload Track</h1>
             <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
             <div th:if="${success}" class="alert alert-success" role="alert" th:text="${success}"></div>
-            <div th:if="${user != null and user.tmnfLogin == null and user.username != 'admin'}" class="alert alert-warning" role="alert">
+            <div th:if="${user != null and user.tmnfLogin == null and user.username != 'admin'}"
+                class="alert alert-warning" role="alert">
                 Your TMNF login is not set. Please set it in your profile. <a th:href="@{/profile}"
                     class="alert-link">Profile</a>
             </div>
             <form method="post" enctype="multipart/form-data" th:action="@{/trackupload}"
-                th:if="${user.tmnfLogin != null or user.username == 'admin'}" th:object="${trackUploadRequest}">
+                th:if="${user.tmnfLogin != null} or ${user.roles.?[name == 'ADMIN'].size() > 0} "
+                th:object="${trackUploadRequest}">
                 <div class="mb-3">
                     <label for="formFile" class="form-label">Choose track file. Make sure it's .Challenge.Gbx
                         file</label>
