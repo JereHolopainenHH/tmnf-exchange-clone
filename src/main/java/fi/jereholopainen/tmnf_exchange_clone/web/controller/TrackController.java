@@ -80,19 +80,6 @@ public class TrackController {
         return "upload";
     }
 
-    @GetMapping("/user/{id}/tracks/")
-    public String showUserTracks(@PathVariable("id") Long userId, Model model, RedirectAttributes redirectAttributes) {
-        try {
-            AppUser user = userService.findByUserId(userId);
-            model.addAttribute("tracks", trackService.getUserTracks(user));
-            model.addAttribute("username", user.getUsername());
-        } catch (UserNotFoundException e) {
-            redirectAttributes.addAttribute("errors", e.getMessage());
-            return "redirect:/tracks";
-        }
-        return "tracks";
-    }
-
     @GetMapping({ "/tracks", "/tracks/" })
     public String showAllTracks(@RequestParam(value = "author", required = false) String author, Model model) {
         if (author != null && !author.isEmpty()) {
@@ -112,6 +99,15 @@ public class TrackController {
             logger.info("Track ID: {}", id);
             Track track = trackService.getTrackById(id);
             model.addAttribute("track", track);
+
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if(auth == null) {
+                return "track";
+            }
+
+            AppUser user = userService.findByUsername(auth.getName());
+            boolean hasAwarded = awardService.hasAwarded(user, track.getId());
+            model.addAttribute("hasAwarded", hasAwarded);
         } catch (TrackNotFoundException e) {
             redirectAttributes.addFlashAttribute("errors", e.getMessage());
             return "redirect:/tracks";

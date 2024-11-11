@@ -41,4 +41,15 @@ public class AwardServiceImpl implements AwardService {
         awardRepository.save(award);
     }
 
+    @Transactional
+    @Override
+    public boolean hasAwarded(AppUser user, Long trackId) {
+        Track track = trackService.getTrackById(trackId);
+        if(track == null) {
+            throw new TrackNotFoundException("Track not found with id: " + trackId);
+        }
+
+        return awardRepository.existsByUserAndTrack(user, track);
+    }
+
 }
