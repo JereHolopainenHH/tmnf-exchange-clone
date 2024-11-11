@@ -18,7 +18,6 @@ import fi.jereholopainen.tmnf_exchange_clone.exception.InvalidFileTypeException;
 import fi.jereholopainen.tmnf_exchange_clone.exception.InvalidTrackAuthorException;
 import fi.jereholopainen.tmnf_exchange_clone.exception.InvalidTrackUIDException;
 import fi.jereholopainen.tmnf_exchange_clone.exception.TmnfLoginNotFoundException;
-import fi.jereholopainen.tmnf_exchange_clone.exception.TrackNotFoundException;
 import fi.jereholopainen.tmnf_exchange_clone.exception.UserNotFoundException;
 import fi.jereholopainen.tmnf_exchange_clone.model.AppUser;
 import fi.jereholopainen.tmnf_exchange_clone.model.Track;
@@ -67,6 +66,7 @@ public class TrackServiceImpl implements TrackService {
         }
 
         logger.info("Authenticated user: {}", user.getUsername());
+        logger.info("Authenticated user's TMNF login: {}", user.getTmnfLogin());
 
         Pattern uidPattern = Pattern.compile("uid=\"([^\"]*)\"");
         Pattern authorPattern = Pattern.compile("author=\"([^\"]*)\"");
@@ -80,7 +80,7 @@ public class TrackServiceImpl implements TrackService {
         logger.info("Extracted type: {}", type);
 
         // Check if the user's tmnflogin is set
-        if (!isAdmin(user) && author.equals(user.getTmnfLogin())) {
+        if (!isAdmin(user) && user.getTmnfLogin() == null) {
             throw new TmnfLoginNotFoundException("Your TMNF login is not set. Please update your profile.");
         }
 

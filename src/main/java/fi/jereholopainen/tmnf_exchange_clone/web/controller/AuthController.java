@@ -26,7 +26,7 @@ public class AuthController {
 
     @GetMapping("/login")
     public String login(@RequestParam(value = "message", required = false) String message,
-            @RequestParam(value = "error", required = false) String error, Model model, Authentication authentication) {
+            @RequestParam(value = "errors", required = false) String error, Model model, Authentication authentication) {
         if (authentication != null && authentication.isAuthenticated()) {
             return "redirect:/home";
         }
@@ -53,7 +53,7 @@ public class AuthController {
     public String register(@Valid RegistrationRequest registrationRequest, RedirectAttributes redirectAttributes,
             Model model) {
         if (!registrationRequest.getPassword().equals(registrationRequest.getConfirmPassword())) {
-            model.addAttribute("error", "Passwords do not match");
+            model.addAttribute("errors", "Passwords do not match");
             return "register";
         }
         try {
@@ -64,7 +64,7 @@ public class AuthController {
             redirectAttributes.addFlashAttribute("message", "User: " + newUser.getUsername() + " created successfully");
             return "redirect:/login";
         } catch (Exception e) {
-            model.addAttribute("error", e.getMessage());
+            model.addAttribute("errors", e.getMessage());
             return "register";
         }
     }

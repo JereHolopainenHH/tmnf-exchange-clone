@@ -33,7 +33,7 @@ public class GlobalExceptionHandler {
     public RedirectView handleException(Exception ex, HttpServletRequest request, RedirectAttributes redirectAttributes) {
         // Log the exception for debugging
         logger.error("An unexpected error occurred");
-        redirectAttributes.addFlashAttribute("error", "An unexpected error occurred.");
+        redirectAttributes.addFlashAttribute("errors", "An unexpected error occurred.");
         return new RedirectView(request.getRequestURI());
     }
 
@@ -99,7 +99,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public RedirectView handleMethodArgumentTypeMismatchExceptions(MethodArgumentConversionNotSupportedException ex, HttpServletRequest request, RedirectAttributes redirectAttributes) {
         logger.error("Invalid argument type");
-        redirectAttributes.addFlashAttribute("error", "Invalid input. Please check your data and try again.");
+        redirectAttributes.addFlashAttribute("errors", "Invalid input. Please check your data and try again.");
         return new RedirectView(request.getRequestURI());
     }
 }

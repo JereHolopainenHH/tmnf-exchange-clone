@@ -60,22 +60,22 @@ public class TrackController {
             RedirectAttributes redirectAttributes, HttpServletRequest request, HttpServletResponse response) {
         try {
             trackService.saveTrack(trackUploadRequest);
-            model.addAttribute("success",
+            model.addAttribute("successes",
                     "File uploaded successfully: " + trackUploadRequest.getFile().getOriginalFilename());
         } catch (InvalidFileTypeException | InvalidTrackAuthorException | InvalidTrackUIDException e) {
-            model.addAttribute("error", e.getMessage());
+            model.addAttribute("errors", e.getMessage());
         } catch (TmnfLoginNotFoundException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            redirectAttributes.addFlashAttribute("errors", e.getMessage());
             return "redirect:/profile";
         } catch (UserNotFoundException e) {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth != null) {
                 new SecurityContextLogoutHandler().logout(request, response, auth);
             }
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            redirectAttributes.addFlashAttribute("errors", e.getMessage());
             return "redirect:/login";
         } catch (IOException e) {
-            model.addAttribute("error", "Error uploading file: " + e.getMessage());
+            model.addAttribute("errors", "Error uploading file: " + e.getMessage());
         }
         return "upload";
     }
@@ -87,7 +87,7 @@ public class TrackController {
             model.addAttribute("tracks", trackService.getUserTracks(user));
             model.addAttribute("username", user.getUsername());
         } catch (UserNotFoundException e) {
-            redirectAttributes.addAttribute("error", e.getMessage());
+            redirectAttributes.addAttribute("errors", e.getMessage());
             return "redirect:/tracks";
         }
         return "tracks";
@@ -113,10 +113,10 @@ public class TrackController {
             Track track = trackService.getTrackById(id);
             model.addAttribute("track", track);
         } catch (TrackNotFoundException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            redirectAttributes.addFlashAttribute("errors", e.getMessage());
             return "redirect:/tracks";
         } catch (NumberFormatException | MethodArgumentTypeMismatchException e) {
-            redirectAttributes.addFlashAttribute("error", "Invalid track ID. ID must be a number.");
+            redirectAttributes.addFlashAttribute("errors", "Invalid track ID. ID must be a number.");
             return "redirect:/tracks";
         }
         return "track";
