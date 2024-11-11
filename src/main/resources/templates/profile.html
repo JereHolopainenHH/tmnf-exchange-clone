@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head}">
+    <title>TMNF Exchange Clone | Profile</title>
+</head>
+
+<body>
+    <header th:replace="~{fragments/header :: header}"></header>
+    <h1>Profile Management</h1>
+    <div th:if="${error}">
+        <p th:text="${error}" style="color: red;"></p>
+    </div>
+    <form method="post" th:action="@{/profile/update}" th:object="${user}">
+        <label for="tmnfLogin">TMNF Login:</label>
+        <input type="text" id="tmnfLogin" th:field="*{tmnfLogin}" required>
+        <br>
+        <button type="submit">Update</button>
+    </form>
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+
+</html>

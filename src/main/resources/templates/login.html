@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head}">
+    <title>TMNF Exchange Clone | login</title>
+</head>
+
+<body>
+    <header th:replace="~{fragments/header :: header}"></header>
+    <h1>Login</h1>
+    <form method="post" th:action="@{/login}">
+        <div>
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required />
+        </div>
+        <div>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required />
+        </div>
+        <div>
+            <button type="submit">Login</button>
+            <a th:href="@{/register}">Register</a>
+        </div>
+    </form>
+    <div th:if="${message}">
+        <p th:text="${message}" style="color: green;"></p>
+    </div>
+    <div th:if="${error}">
+        <p style="color: red;" th:text="${error}">Invalid username or password.</p>
+    </div>
+    <div th:if="${param['invalid-session']}">
+        <p style="color: red;">Your session is invalid. Please log in again.</p>
+    </div>
+    <div th:if="${param['expired-session']}">
+        <p style="color: red;">Your session has expired. Please log in again.</p>
+    </div>
+    <div th:if="${param.logout}">
+        <p style="color: green;">You have been logged out successfully.</p>
+    </div>
+
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+
+</html>
