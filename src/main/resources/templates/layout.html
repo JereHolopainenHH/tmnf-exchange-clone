@@ -1,13 +1,17 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:fragment="layout(title)">
 
-<head th:replace="~{fragments/head :: head}">
-    <title>TMNF Exchange Clone</title>
-</head>
+<head th:replace="~{fragments/head :: head(${title})}"></head>
 
-<body th:fragment="layout">
+<body>
     <header th:replace="~{fragments/header :: header}"></header>
-    <div th:insert="~{::body}"></div>
+    <div class="container">
+        <main>
+            <div th:insert="~{fragments/alerts :: alerts}"></div>
+            <div th:insert="~{::content}">
+            </div>
+        </main>
+    </div>
     <footer th:replace="~{fragments/footer :: footer}"></footer>
 </body>
 

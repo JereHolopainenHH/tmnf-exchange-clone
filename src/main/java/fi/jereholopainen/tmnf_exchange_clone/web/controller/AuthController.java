@@ -5,6 +5,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import fi.jereholopainen.tmnf_exchange_clone.model.AppUser;
 import fi.jereholopainen.tmnf_exchange_clone.service.UserService;
+import fi.jereholopainen.tmnf_exchange_clone.web.dto.LoginRequest;
 import fi.jereholopainen.tmnf_exchange_clone.web.dto.RegistrationRequest;
 import jakarta.validation.Valid;
 
@@ -25,16 +26,17 @@ public class AuthController {
 
     @GetMapping("/login")
     public String login(@RequestParam(value = "message", required = false) String message,
-            @RequestParam(value = "error", required = false) String error, Model model, Authentication authentication) {
+            @RequestParam(value = "errors", required = false) String error, Model model, Authentication authentication) {
         if (authentication != null && authentication.isAuthenticated()) {
             return "redirect:/home";
         }
         if (message != null) {
-            model.addAttribute("message", message);
+            model.addAttribute("successes", message);
         }
         if (error != null) {
-            model.addAttribute("error", "Invalid username or password");
+            model.addAttribute("errors", "Invalid username or password");
         }
+        model.addAttribute("loginRequest", new LoginRequest());
         return "login";
     }
 
@@ -51,7 +53,7 @@ public class AuthController {
     public String register(@Valid RegistrationRequest registrationRequest, RedirectAttributes redirectAttributes,
             Model model) {
         if (!registrationRequest.getPassword().equals(registrationRequest.getConfirmPassword())) {
-            model.addAttribute("error", "Passwords do not match");
+            model.addAttribute("errors", "Passwords do not match");
             return "register";
         }
         try {
@@ -62,7 +64,7 @@ public class AuthController {
             redirectAttributes.addFlashAttribute("message", "User: " + newUser.getUsername() + " created successfully");
             return "redirect:/login";
         } catch (Exception e) {
-            model.addAttribute("error", e.getMessage());
+            model.addAttribute("errors", e.getMessage());
             return "register";
         }
     }

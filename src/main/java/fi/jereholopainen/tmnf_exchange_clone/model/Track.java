@@ -2,7 +2,9 @@ package fi.jereholopainen.tmnf_exchange_clone.model;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -17,7 +19,8 @@ import jakarta.validation.constraints.NotNull;
 @Entity
 public class Track {
 
-   // Track(id, name, description, uid, filePath, User<userId>, List<Comment>, List<Replay>)
+    // Track(id, name, description, uid, filePath, User<userId>, List<Comment>,
+    // List<Replay>)
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,35 +47,45 @@ public class Track {
     @NotBlank(message = "Track tag is required")
     private String tag; // Track tag
 
-    private LocalDateTime createdAt = LocalDateTime.now(); // Track creation date
+    @NotBlank(message = "Track difficulty is required")
+    private String difficulty;
 
-    private Integer awards = 0; // Track awards
+    private LocalDateTime createdAt = LocalDateTime.now(); // Track creation date
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @NotNull(message = "Track needs to be associated with a user")
     private AppUser user; // User who uploaded the track
 
-    @OneToMany(mappedBy = "track")
+    @OneToMany(mappedBy = "track", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments; // Comments on the track
 
-    @OneToMany(mappedBy = "track")
+    @OneToMany(mappedBy = "track", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Replay> replays; // Replays for the track
 
-    // Constructors
+    @OneToMany(mappedBy = "track", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Award> awards;
+
     public Track() {
     }
 
-    public Track(String name, String description, String uid, String author, String filePath, AppUser user) {
+    public Track(@NotBlank(message = "Track name is required") String name, String description,
+            @NotBlank(message = "Track uid is required") String uid,
+            @NotBlank(message = "Track author is required") String author,
+            @NotBlank(message = "Track filepath is required") String filePath,
+            @NotBlank(message = "Track type is required") String type,
+            @NotBlank(message = "Track tag is required") String tag,
+            @NotBlank(message = "Track difficulty is required") String difficulty) {
         this.name = name;
         this.description = description;
         this.uid = uid;
         this.author = author;
         this.filePath = filePath;
-        this.user = user;
+        this.type = type;
+        this.tag = tag;
+        this.difficulty = difficulty;
     }
 
-    // Getters and setters
     public Long getId() {
         return id;
     }
@@ -121,20 +134,36 @@ public class Track {
         this.filePath = filePath;
     }
 
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
+    public String getDifficulty() {
+        return difficulty;
+    }
+
+    public void setDifficulty(String difficulty) {
+        this.difficulty = difficulty;
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
-    }
-
-    public Integer getAwards() {
-        return awards;
-    }
-
-    public void setAwards(Integer awards) {
-        this.awards = awards;
     }
 
     public AppUser getUser() {
@@ -161,6 +190,22 @@ public class Track {
         this.replays = replays;
     }
 
-    
-    
+    public Set<Award> getAwards() {
+        return awards;
+    }
+
+    public void setAwards(Set<Award> awards) {
+        this.awards = awards;
+    }
+
+    public void addComment(Comment comment) {
+        comments.add(comment);
+        comment.setTrack(this);
+    }
+
+    public void removeComment(Comment comment) {
+        comments.remove(comment);
+        comment.setTrack(null);
+    }
+
 }

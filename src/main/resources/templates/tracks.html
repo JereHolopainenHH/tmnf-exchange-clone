@@ -1,24 +1,13 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-
-<head th:replace="~{fragments/head :: head}">
-    <title>TMNF Exchange Clone | Tracks</title>
-</head>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout('Tracks Page')}">
 
 <body>
-    <header th:replace="~{fragments/header :: header}"></header>
-    <h1 th:if="${username}" th:text="'Tracks for ' + ${username}">Tracks</h1>
-    <h1 th:if="${username == null}">Tracks</h1>
-    <p th:if="${error}" th:text="${error}" style="color: red"></p>
-    <tbody>
-        <tr th:each="track : ${tracks}">
-            <td><a th:href="@{/tracks/{id}(id=${track.id})}" th:text="${track.name}"></a></td>
-            <td th:text="${track.author}"></td>
-            <td th:text="${track.uid}"></td>
-            <td th:text="${track.filePath}"></td>
-        </tr>
-    </tbody>
-    <footer th:replace="~{fragments/footer :: footer}"></footer>
+    <div th:fragment="content">
+        <h1 th:if="${author}" th:text="${author} + '\'s tracks'">Tracks</h1>
+        <h1 th:if="${author == null or author.isEmpty()}">Tracks</h1>
+        <p th:if="${error}" th:text="${error}" style="color: red"></p>
+        <table th:replace="~{fragments/track-table :: table(${tracks})}"></table>
+    </div>
 </body>
 
 </html>

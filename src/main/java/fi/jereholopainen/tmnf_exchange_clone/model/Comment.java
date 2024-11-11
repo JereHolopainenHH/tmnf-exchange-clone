@@ -24,8 +24,7 @@ public class Comment {
     @Size(max = 500, message = "Comment text must be at most 500 characters long")
     private String commentText; // Comment text
 
-    @NotNull(message = "Comment posted at date required")
-    private LocalDateTime postedAt; // Time when the comment was posted
+    private LocalDateTime postedAt = LocalDateTime.now(); // Time when the comment was posted
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
