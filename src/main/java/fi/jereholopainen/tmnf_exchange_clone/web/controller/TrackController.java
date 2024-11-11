@@ -1,6 +1,7 @@
 package fi.jereholopainen.tmnf_exchange_clone.web.controller;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -19,11 +20,14 @@ import fi.jereholopainen.tmnf_exchange_clone.exception.TrackNotFoundException;
 import fi.jereholopainen.tmnf_exchange_clone.exception.UserNotFoundException;
 import fi.jereholopainen.tmnf_exchange_clone.model.AppUser;
 import fi.jereholopainen.tmnf_exchange_clone.model.Comment;
+import fi.jereholopainen.tmnf_exchange_clone.model.Replay;
 import fi.jereholopainen.tmnf_exchange_clone.model.Track;
 import fi.jereholopainen.tmnf_exchange_clone.service.AwardService;
 import fi.jereholopainen.tmnf_exchange_clone.service.CommentService;
+import fi.jereholopainen.tmnf_exchange_clone.service.ReplayService;
 import fi.jereholopainen.tmnf_exchange_clone.service.TrackService;
 import fi.jereholopainen.tmnf_exchange_clone.service.UserService;
+import fi.jereholopainen.tmnf_exchange_clone.web.dto.ReplayRequest;
 import fi.jereholopainen.tmnf_exchange_clone.web.dto.TrackUploadRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -36,6 +40,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -48,12 +53,15 @@ public class TrackController {
     private final UserService userService;
     private final AwardService awardService;
     private final CommentService commentService;
+    private final ReplayService replayService;
 
-    public TrackController(TrackService trackService, UserService userService, AwardService awardService, CommentService commentService) {
+    public TrackController(TrackService trackService, UserService userService, AwardService awardService,
+            CommentService commentService, ReplayService replayService) {
         this.trackService = trackService;
         this.userService = userService;
         this.awardService = awardService;
         this.commentService = commentService;
+        this.replayService = replayService;
     }
 
     @GetMapping("/upload")
@@ -102,11 +110,15 @@ public class TrackController {
     }
 
     @GetMapping("/{id}")
-    public String showTrackById(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
+    public String showTrackById(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes,
+            ReplayRequest replayRequest) {
         try {
             logger.info("Track ID: {}", id);
             Track track = trackService.getTrackById(id);
+            List<Replay> replays = track.getReplays();
+            replays.sort(Comparator.comparingInt(Replay::getTime));
             model.addAttribute("track", track);
+            model.addAttribute("replays", replays);
 
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth == null || auth.getName().equals("anonymousUser")) {
@@ -116,6 +128,7 @@ public class TrackController {
 
             AppUser user = userService.findByUsername(auth.getName());
             boolean hasAwarded = awardService.hasAwarded(user, track.getId());
+            model.addAttribute("replayRequest", replayRequest);
             model.addAttribute("hasAwarded", hasAwarded);
         } catch (TrackNotFoundException e) {
             redirectAttributes.addFlashAttribute("errors", e.getMessage());
@@ -157,7 +170,8 @@ public class TrackController {
     }
 
     @DeleteMapping("/{trackId}/comments/{commentId}/delete")
-    public String deleteComment(@PathVariable("trackId") Long trackId, @PathVariable("commentId") Long commentId, RedirectAttributes redirectAttributes) {
+    public String deleteComment(@PathVariable("trackId") Long trackId, @PathVariable("commentId") Long commentId,
+            RedirectAttributes redirectAttributes) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         AppUser user = userService.findByUsername(auth.getName());
         logger.info("Deleting comment with ID: {}", commentId);
@@ -171,6 +185,25 @@ public class TrackController {
                 redirectAttributes.addFlashAttribute("errors", "You are not authorized to delete this comment.");
             }
         } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errors", e.getMessage());
+        }
+        return "redirect:/tracks/" + trackId;
+    }
+
+    @PostMapping("/{id}/replays")
+    public String uploadReplay(@PathVariable("id") Long trackId, @ModelAttribute ReplayRequest replayRequest, Model model,
+            RedirectAttributes redirectAttributes, HttpServletRequest request, HttpServletResponse response) {
+        try {
+            MultipartFile file = replayRequest.getFile();
+            logger.info("Replay file: {}", file.getOriginalFilename());
+            replayService.saveReplay(file, trackId);
+            logger.info("Replay uploaded successfully.");
+            redirectAttributes.addFlashAttribute("successes",
+                    "Replay uploaded successfully: " + replayRequest.getFile().getOriginalFilename());
+        } catch (InvalidFileTypeException | TrackNotFoundException | InvalidTrackUIDException
+                | TmnfLoginNotFoundException e) {
+            redirectAttributes.addFlashAttribute("errors", e.getMessage());
+        } catch (RuntimeException e) {
             redirectAttributes.addFlashAttribute("errors", e.getMessage());
         }
         return "redirect:/tracks/" + trackId;

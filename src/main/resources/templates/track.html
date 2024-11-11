@@ -16,6 +16,34 @@
         </div>
         <table th:replace="~{fragments/track-table :: table(${track})}"></table>
 
+        <form th:action="@{/tracks/{id}/replays(id=${track.id})}" method="post" th:object="${replayRequest}" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label for="formFile" class="form-label">Default file input example</label>
+                <input class="form-control" type="file" id="formFile" th:field="*{file}">
+            </div>
+            <button type="submit" class="btn btn-primary">Add Replay</button>
+        </form>
+        <!-- Replays Section -->
+        <div class="mt-4">
+            <h2>Replays</h2>
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Driven Time</th>
+                        <th>Driver</th>
+                        <th>Uploaded At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="replay : ${replays}">
+                        <td th:text="${@timeUtils.convertMillisToMinutesAndSeconds(replay.time)}">Driven Time</td>
+                        <td th:text="${replay.user.getUsername()}">Driver</td>
+                        <td th:text="${replay.createdAt}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
         <!-- Comment Section -->
         <div class="mt-4">
             <h2>Comments</h2>

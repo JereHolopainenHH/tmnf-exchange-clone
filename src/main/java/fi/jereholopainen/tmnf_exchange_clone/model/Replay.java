@@ -1,5 +1,7 @@
 package fi.jereholopainen.tmnf_exchange_clone.model;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -17,15 +19,17 @@ public class Replay {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Replay author is required")
-    private String author;
+    @NotBlank(message = "Replay driver is required")
+    private String driver;
+
+    @NotNull(message = "Replay time is required")
+    private int time;
 
     @NotBlank(message = "Replay filepath is required")
     @Column(unique = true)
     private String filePath;
 
     @NotBlank(message = "Track uid that the replay is for is required")
-    @Column(unique = true)
     private String uid;
 
     @ManyToOne
@@ -38,12 +42,14 @@ public class Replay {
     @NotNull(message = "Replay needs to be associated with a user")
     private AppUser user;
 
+    private LocalDateTime createdAt = LocalDateTime.now();
+
     // Constructors
     public Replay() {
     }
 
-    public Replay(String author, String filePath, String uid, Track track, AppUser user) {
-        this.author = author;
+    public Replay(String driver, String filePath, String uid, Track track, AppUser user) {
+        this.driver = driver;
         this.filePath = filePath;
         this.uid = uid;
         this.track = track;
@@ -59,12 +65,12 @@ public class Replay {
         this.id = id;
     }
 
-    public String getAuthor() {
-        return author;
+    public String getDriver() {
+        return driver;
     }
 
-    public void setAuthor(String author) {
-        this.author = author;
+    public void setDriver(String driver) {
+        this.driver = driver;
     }
 
     public String getFilePath() {
@@ -99,6 +105,20 @@ public class Replay {
         this.user = user;
     }
 
-    
+    public int getTime() {
+        return time;
+    }
+
+    public void setTime(int time) {
+        this.time = time;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
 
 }

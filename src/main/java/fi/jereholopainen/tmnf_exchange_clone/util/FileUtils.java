@@ -15,6 +15,7 @@ public class FileUtils {
     private FileUtils() {
         // Private constructor to prevent instantiation
     }
+
     public static boolean isValidFileType(MultipartFile file, String extension) {
         String fileName = file.getOriginalFilename();
         logger.info("File name: {}", fileName);
@@ -46,10 +47,37 @@ public class FileUtils {
         if (fileName == null || fileName.isEmpty()) {
             return "";
         }
-        String extension = ".challenge.gbx";
-        if (fileName.toLowerCase().endsWith(extension)) {
-            return fileName.substring(0, fileName.length() - extension.length());
+        String challengeExt = ".challenge.gbx";
+        String replayExt = ".replay.gbx";
+        if (fileName.toLowerCase().endsWith(challengeExt)) {
+            return fileName.substring(0, fileName.length() - challengeExt.length());
+        }
+        if (fileName.toLowerCase().endsWith(replayExt)) {
+            return fileName.substring(0, fileName.length() - replayExt.length());
         }
         return fileName; // No extension found
     }
+
+    // Check if user's TMNF login exists in the file
+    public static boolean checkTmnfLogin(String content, String tmnfLogin) {
+        return content.contains(tmnfLogin);
+    }
+
+    // Extract best time in milliseconds
+    public static int extractBestTimeInMilliseconds(String content) {
+        Pattern pattern = Pattern.compile("<times best=\"(\\d+)\"");
+        Matcher matcher = pattern.matcher(content);
+        if (matcher.find()) {
+            return Integer.parseInt(matcher.group(1));
+        }
+        return -1; // Return -1 if the pattern is not found
+    }
 }
+
+/*
+ * extract challenge uid
+ * 
+ * check if tmnflogin found in the file
+ * 
+ * extract times best in ms
+ */
