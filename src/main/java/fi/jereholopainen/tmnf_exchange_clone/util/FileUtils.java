@@ -29,32 +29,17 @@ public class FileUtils {
         return isValidFileType(file, ".replay.gbx");
     }
 
-    public static String extractUidFromFile(MultipartFile file) throws IOException {
-        Pattern uidPattern = Pattern.compile("uid=\"([^\"]+)\"");
+    public static String extractFromFile(MultipartFile file, Pattern pattern) throws IOException {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                Matcher matcher = uidPattern.matcher(line);
+                Matcher matcher = pattern.matcher(line);
                 if (matcher.find()) {
                     return matcher.group(1);
                 }
             }
         }
-        throw new IOException("UID not found in the file");
-    }
-
-    public static String extractAuthorFromFile(MultipartFile file) throws IOException {
-        Pattern authorPattern = Pattern.compile("author=\"([^\"]+)\"");
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                Matcher matcher = authorPattern.matcher(line);
-                if (matcher.find()) {
-                    return matcher.group(1);
-                }
-            }
-        }
-        throw new IOException("Author not found in the file");
+        throw new IOException("Pattern " + pattern.toString() + " not found in the file");
     }
 
     public static String getBasenameWithoutExtension(String fileName) {

@@ -8,4 +8,9 @@ public interface UserService {
     AppUser findByTmnfLogin(String tmnfLogin);
     AppUser findByUserId(Long userId);
     void updateTmnfLogin(String username, String tmnfLogin);
+    void updateUsername(String oldUsername, String newUsername);
+    void updatePassword(String username, String newPassword);
+    boolean isUsernameTaken(String username);
+    boolean isTmnfLoginTaken(String tmnfLogin);
+    boolean checkPassword(String username, String password);
 }

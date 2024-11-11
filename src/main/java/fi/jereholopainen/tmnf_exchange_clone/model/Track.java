@@ -17,7 +17,8 @@ import jakarta.validation.constraints.NotNull;
 @Entity
 public class Track {
 
-   // Track(id, name, description, uid, filePath, User<userId>, List<Comment>, List<Replay>)
+    // Track(id, name, description, uid, filePath, User<userId>, List<Comment>,
+    // List<Replay>)
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,6 +45,9 @@ public class Track {
     @NotBlank(message = "Track tag is required")
     private String tag; // Track tag
 
+    @NotBlank(message = "Track difficulty is required")
+    private String difficulty;
+
     private LocalDateTime createdAt = LocalDateTime.now(); // Track creation date
 
     private Integer awards = 0; // Track awards
@@ -59,20 +63,26 @@ public class Track {
     @OneToMany(mappedBy = "track")
     private List<Replay> replays; // Replays for the track
 
-    // Constructors
     public Track() {
     }
 
-    public Track(String name, String description, String uid, String author, String filePath, AppUser user) {
+    public Track(@NotBlank(message = "Track name is required") String name, String description,
+            @NotBlank(message = "Track uid is required") String uid,
+            @NotBlank(message = "Track author is required") String author,
+            @NotBlank(message = "Track filepath is required") String filePath,
+            @NotBlank(message = "Track type is required") String type,
+            @NotBlank(message = "Track tag is required") String tag,
+            @NotBlank(message = "Track difficulty is required") String difficulty) {
         this.name = name;
         this.description = description;
         this.uid = uid;
         this.author = author;
         this.filePath = filePath;
-        this.user = user;
+        this.type = type;
+        this.tag = tag;
+        this.difficulty = difficulty;
     }
 
-    // Getters and setters
     public Long getId() {
         return id;
     }
@@ -121,6 +131,30 @@ public class Track {
         this.filePath = filePath;
     }
 
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
+    public String getDifficulty() {
+        return difficulty;
+    }
+
+    public void setDifficulty(String difficulty) {
+        this.difficulty = difficulty;
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -161,6 +195,4 @@ public class Track {
         this.replays = replays;
     }
 
-    
-    
 }

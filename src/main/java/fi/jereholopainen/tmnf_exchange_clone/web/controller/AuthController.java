@@ -5,6 +5,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import fi.jereholopainen.tmnf_exchange_clone.model.AppUser;
 import fi.jereholopainen.tmnf_exchange_clone.service.UserService;
+import fi.jereholopainen.tmnf_exchange_clone.web.dto.LoginRequest;
 import fi.jereholopainen.tmnf_exchange_clone.web.dto.RegistrationRequest;
 import jakarta.validation.Valid;
 
@@ -30,11 +31,12 @@ public class AuthController {
             return "redirect:/home";
         }
         if (message != null) {
-            model.addAttribute("message", message);
+            model.addAttribute("successes", message);
         }
         if (error != null) {
-            model.addAttribute("error", "Invalid username or password");
+            model.addAttribute("errors", "Invalid username or password");
         }
+        model.addAttribute("loginRequest", new LoginRequest());
         return "login";
     }
 

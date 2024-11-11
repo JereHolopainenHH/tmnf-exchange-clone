@@ -3,7 +3,7 @@ package fi.jereholopainen.tmnf_exchange_clone.web.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-public class RegistrationRequest {
+public class LoginRequest {
 
     @NotBlank(message = "Username is required")
     @Size(min = 4, max = 20, message = "Username must be between 4 and 20 characters")
@@ -13,19 +13,14 @@ public class RegistrationRequest {
     @Size(min = 8, message = "Password must be at least 8 characters long")
     private String password;
 
-    @NotBlank(message = "Confirm Password is required")
-    @Size(min = 8, message = "Confirm Password must be at least 8 characters long")
-    private String confirmPassword;
-
     // Default constructor
-    public RegistrationRequest() {
+    public LoginRequest() {
     }
 
     // Constructor with parameters
-    public RegistrationRequest(String username, String password, String confirmPassword) {
+    public LoginRequest(String username, String password) {
         this.username = username;
         this.password = password;
-        this.confirmPassword = confirmPassword;
     }
 
     // Getters and setters
@@ -44,13 +39,4 @@ public class RegistrationRequest {
     public void setPassword(String password) {
         this.password = password;
     }
-
-    public String getConfirmPassword() {
-        return confirmPassword;
-    }
-
-    public void setConfirmPassword(String confirmPassword) {
-        this.confirmPassword = confirmPassword;
-    }
-
 }

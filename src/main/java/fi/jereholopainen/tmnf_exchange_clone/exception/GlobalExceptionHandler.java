@@ -1,27 +1,40 @@
 package fi.jereholopainen.tmnf_exchange_clone.exception;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentConversionNotSupportedException;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.view.RedirectView;
 
-@ControllerAdvice
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        List<String> errors = new ArrayList<>();
-        ex.getBindingResult().getFieldErrors()
-                .forEach(error -> errors.add(error.getField() + ": " + error.getDefaultMessage()));
+    private final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-        ErrorResponse errorResponse = new ErrorResponse("Validation failed", errors);
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public RedirectView handleException(Exception ex, HttpServletRequest request, RedirectAttributes redirectAttributes) {
+        // Log the exception for debugging
+        logger.error("An unexpected error occurred");
+        redirectAttributes.addFlashAttribute("error", "An unexpected error occurred.");
+        return new RedirectView(request.getRequestURI());
     }
 
     @ExceptionHandler(BadRequestException.class)
@@ -42,30 +55,51 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(UserAlreadyExistsException.class)
+    @ExceptionHandler(UsernameTakenException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ResponseEntity<ErrorResponse> handleUserAlreadyExists(UserAlreadyExistsException ex) {
+    public ResponseEntity<ErrorResponse> handleUserAlreadyExists(UsernameTakenException ex) {
         List<String> details = new ArrayList<>();
         details.add(ex.getMessage());
-        ErrorResponse errorResponse = new ErrorResponse("Not Found", details);
+        ErrorResponse errorResponse = new ErrorResponse("Conflict", details);
         return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
 
-    @ExceptionHandler(IOException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ResponseEntity<ErrorResponse> handleIOException(IOException ex) {
-        List<String> details = new ArrayList<>();
-        details.add(ex.getMessage());
-        ErrorResponse errorResponse = new ErrorResponse("Internal Server Error", details);
-        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public RedirectView handleValidationExceptions(MethodArgumentNotValidException ex, HttpServletRequest request, RedirectAttributes redirectAttributes) {
+        List<String> errors = ex.getBindingResult()
+                .getAllErrors()
+                .stream()
+                .map(error -> {
+                    if (error instanceof FieldError) {
+                        return ((FieldError) error).getField() + ": " + error.getDefaultMessage();
+                    } else {
+                        return error.getObjectName() + ": " + error.getDefaultMessage();
+                    }
+                })
+                .collect(Collectors.toList());
+
+        redirectAttributes.addFlashAttribute("errors", errors);
+        return new RedirectView(request.getRequestURI());
     }
 
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ResponseEntity<ErrorResponse> handleGeneralException(Exception ex) {
-        List<String> details = new ArrayList<>();
-        details.add(ex.getMessage());
-        ErrorResponse errorResponse = new ErrorResponse("Internal Server Error", details);
-        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ErrorResponse> handleConstraintViolationExceptions(ConstraintViolationException ex) {
+        List<String> errors = ex.getConstraintViolations()
+                .stream()
+                .map(ConstraintViolation::getMessage)
+                .collect(Collectors.toList());
+
+        ErrorResponse errorResponse = new ErrorResponse("Validation Failed", errors);
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public RedirectView handleMethodArgumentTypeMismatchExceptions(MethodArgumentConversionNotSupportedException ex, HttpServletRequest request, RedirectAttributes redirectAttributes) {
+        logger.error("Invalid argument type");
+        redirectAttributes.addFlashAttribute("error", "Invalid input. Please check your data and try again.");
+        return new RedirectView(request.getRequestURI());
     }
 }

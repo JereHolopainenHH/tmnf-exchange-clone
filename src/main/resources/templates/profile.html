@@ -1,23 +1,62 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-
-<head th:replace="~{fragments/head :: head}">
-    <title>TMNF Exchange Clone | Profile</title>
-</head>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout('Profile Page')}">
 
 <body>
-    <header th:replace="~{fragments/header :: header}"></header>
-    <h1>Profile Management</h1>
-    <div th:if="${error}">
-        <p th:text="${error}" style="color: red;"></p>
+    <div th:fragment="content">
+        <h1>Profile Management</h1>
+
+        <div class="row">
+            <!-- Form to update username and TMNF login -->
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Update Profile Details</h2>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" th:action="@{/profile/update-profile}" th:object="${updateProfileRequest}">
+                            <input type="hidden" name="_method" value="patch"/>
+                            <div class="mb-3">
+                                <label for="username" class="form-label">Username (current username: <span th:text="${user.username}"></span>)</label>
+                                <input type="text" id="username" th:field="*{username}" class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label for="tmnfLogin" class="form-label">TMNF Login (current tmnf login: <span th:text="${user.tmnfLogin}"></span>)</label>
+                                <input type="text" id="tmnfLogin" th:field="*{tmnfLogin}" class="form-control">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Update Profile</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form to update password -->
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Update Password</h2>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" th:action="@{/profile/update-password}" th:object="${updatePasswordRequest}">
+                            <input type="hidden" name="_method" value="patch"/>
+                            <div class="mb-3">
+                                <label for="oldPassword" class="form-label">Old Password</label>
+                                <input type="password" id="oldPassword" th:field="*{oldPassword}" class="form-control" minlength="8" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="newPassword" class="form-label">New Password</label>
+                                <input type="password" id="newPassword" th:field="*{newPassword}" class="form-control" minlength="8" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="confirmNewPassword" class="form-label">Confirm New Password</label>
+                                <input type="password" id="confirmNewPassword" th:field="*{confirmNewPassword}" class="form-control" minlength="8" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Update Password</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <form method="post" th:action="@{/profile/update}" th:object="${user}">
-        <label for="tmnfLogin">TMNF Login:</label>
-        <input type="text" id="tmnfLogin" th:field="*{tmnfLogin}" required>
-        <br>
-        <button type="submit">Update</button>
-    </form>
-    <footer th:replace="~{fragments/footer :: footer}"></footer>
 </body>
 
 </html>

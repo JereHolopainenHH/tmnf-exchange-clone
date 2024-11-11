@@ -1,24 +1,20 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-
-<head th:replace="~{fragments/head :: head}">
-    <title>TMNF Exchange Clone | Track</title>
-</head>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout('Track Page')}">
 
 <body>
-    <header th:replace="~{fragments/header :: header}"></header>
-    <h1 th:text="${track.name}">Tracks</h1>
-    <tbody>
-        <tr>
-            <td th:text="${track.name}"></td>
-            <td th:text="${track.author}"></td>
-            <td th:text="${track.uid}"></td>
-            <td th:text="${track.filePath}"></td>
-            <td th:text="${track.createdAt}"></td>
-            <td th:text="${track.awards}"></td>
-        </tr>
-    </tbody>
-    <footer th:replace="~{fragments/footer :: footer}"></footer>
+    <div th:fragment="content">
+        <h1 th:text="${track.name}">Tracks</h1>
+        <tbody>
+            <tr>
+                <td th:text="${track.name}"></td>
+                <td th:text="${track.author}"></td>
+                <td th:text="${track.uid}"></td>
+                <td th:text="${track.filePath}"></td>
+                <td th:text="${track.createdAt}"></td>
+                <td th:text="${track.awards}"></td>
+            </tr>
+        </tbody>
+    </div>
 </body>
 
 </html>

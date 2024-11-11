@@ -27,7 +27,7 @@ public class AppUser {
 
     @NotBlank(message = "Username is required")
     @Column(unique = true)
-    @Size(min = 3, max = 20, message = "Username must be between 3 and 20 characters long")
+    @Size(min = 4, max = 20, message = "Username must be between 4 and 20 characters long")
     private String username; // Username
 
     @NotBlank(message = "Password is required")
