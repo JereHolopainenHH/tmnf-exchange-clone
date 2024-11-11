@@ -101,7 +101,7 @@ public class TrackController {
             model.addAttribute("track", track);
 
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            if(auth == null) {
+            if (auth == null) {
                 return "track";
             }
 
@@ -128,6 +128,22 @@ public class TrackController {
         } catch (TrackNotFoundException e) {
             redirectAttributes.addFlashAttribute("errors", e.getMessage());
         }
+        return "redirect:/tracks/" + id;
+    }
+
+    @PostMapping("/tracks/{id}/comments")
+    public String postComment(@PathVariable("id") Long id, @RequestParam("commentText") String commentText, Model model,
+            RedirectAttributes redirectAttributes) {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        AppUser user = userService.findByUsername(auth.getName());
+        try {
+            trackService.postComment(user, id, commentText);
+            redirectAttributes.addFlashAttribute("successes", "Comment posted successfully.");
+        } catch (TrackNotFoundException e) {
+            redirectAttributes.addFlashAttribute("errors", e.getMessage());
+        }
+
         return "redirect:/tracks/" + id;
     }
 }

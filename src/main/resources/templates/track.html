@@ -5,14 +5,42 @@
     <div th:fragment="content">
         <div class="d-flex my-2">
             <h1 class="flex-grow-1" th:text="${track.name}">Tracks</h1>
-                <input type="hidden" name="id" _method="delete" />
-                <form sec:authorization="isAuthenticated()" th:if="${hasAwarded == false and user.tmnfLogin != track.author}" th:action="@{/tracks/{id}/award(id=${track.id})}" method="post">
+            <form sec:authorization="isAuthenticated()"
+                th:if="${hasAwarded == false and user.tmnfLogin != track.author}"
+                th:action="@{/tracks/{id}/award(id=${track.id})}" method="post">
                 <button type="submit" class="btn btn-primary">
                     <i class="fa-solid fa-trophy" style="color: gold;"></i> Award
                 </button>
             </form>
         </div>
         <table th:replace="~{fragments/track-table :: table(${track})}"></table>
+
+        <!-- Comment Section -->
+        <div class="mt-4">
+            <h2>Comments</h2>
+            <div th:if="${track.comments}" th:each="comment : ${track.comments}">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title" th:text="${comment.user.username}">Username</h5>
+                        <p class="card-text" th:text="${comment.commentText}">Comment content</p>
+                        <p class="card-text"><small class="text-muted"
+                                th:text="'Posted At: ' + ${comment.postedAt}">Date</small></p>
+                        <form th:action="@{/tracks/{trackId}/comments/{commentId}/delete(trackId=${track.id}, commentId=${comment.id})}" method="post" th:if="${comment.user.username == #authentication.name}">
+                            <input type="hidden" name="_method" value="delete" />
+                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <form th:action="@{/tracks/{id}/comments(id=${track.id})}" method="post" sec:authorize="isAuthenticated()">
+                <div class="mb-3">
+                    <label for="commentText" class="form-label">Add a Comment</label>
+                    <textarea class="form-control" id="commentText" name="commentText" rows="3" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
     </div>
 </body>
 

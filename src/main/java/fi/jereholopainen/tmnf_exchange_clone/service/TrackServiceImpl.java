@@ -20,7 +20,9 @@ import fi.jereholopainen.tmnf_exchange_clone.exception.InvalidTrackUIDException;
 import fi.jereholopainen.tmnf_exchange_clone.exception.TmnfLoginNotFoundException;
 import fi.jereholopainen.tmnf_exchange_clone.exception.UserNotFoundException;
 import fi.jereholopainen.tmnf_exchange_clone.model.AppUser;
+import fi.jereholopainen.tmnf_exchange_clone.model.Comment;
 import fi.jereholopainen.tmnf_exchange_clone.model.Track;
+import fi.jereholopainen.tmnf_exchange_clone.repository.CommentRepository;
 import fi.jereholopainen.tmnf_exchange_clone.repository.TrackRepository;
 import fi.jereholopainen.tmnf_exchange_clone.web.dto.TrackUploadRequest;
 import jakarta.transaction.Transactional;
@@ -36,10 +38,12 @@ public class TrackServiceImpl implements TrackService {
 
     private final TrackRepository trackRepository;
     private final UserService userService;
+    private final CommentRepository commentRepository;
 
-    public TrackServiceImpl(TrackRepository trackRepository, UserService userService) {
+    public TrackServiceImpl(TrackRepository trackRepository, UserService userService, CommentRepository commentRepository) {
         this.trackRepository = trackRepository;
         this.userService = userService;
+        this.commentRepository = commentRepository;
     }
 
     @Transactional
@@ -138,5 +142,14 @@ public class TrackServiceImpl implements TrackService {
     private boolean isAdmin(AppUser user) {
         return user.getRoles().stream()
                 .anyMatch(role -> role.getName().equals("ADMIN"));
+    }
+
+    public void postComment(AppUser user, Long trackId, String commentText){
+        Track track = getTrackById(trackId);
+        Comment comment = new Comment();
+        comment.setUser(user);
+        comment.setCommentText(commentText);
+        track.addComment(comment);
+        commentRepository.save(comment);
     }
 }

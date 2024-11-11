@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -56,13 +57,13 @@ public class Track {
     @NotNull(message = "Track needs to be associated with a user")
     private AppUser user; // User who uploaded the track
 
-    @OneToMany(mappedBy = "track")
+    @OneToMany(mappedBy = "track", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments; // Comments on the track
 
-    @OneToMany(mappedBy = "track")
+    @OneToMany(mappedBy = "track", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Replay> replays; // Replays for the track
 
-    @OneToMany(mappedBy = "track")
+    @OneToMany(mappedBy = "track", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Award> awards;
 
     public Track() {
@@ -195,6 +196,16 @@ public class Track {
 
     public void setAwards(Set<Award> awards) {
         this.awards = awards;
+    }
+
+    public void addComment(Comment comment) {
+        comments.add(comment);
+        comment.setTrack(this);
+    }
+
+    public void removeComment(Comment comment) {
+        comments.remove(comment);
+        comment.setTrack(null);
     }
 
 }
