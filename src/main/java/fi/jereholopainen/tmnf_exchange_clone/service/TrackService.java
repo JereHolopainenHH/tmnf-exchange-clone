@@ -12,4 +12,6 @@ public interface TrackService {
     Track saveFile(MultipartFile file) throws IOException;
     List<Track> getAllTracks();
     List<Track> getUserTracks(AppUser user);
+    Track getTrackById(Long id);
+    List<Track> getTracksByAuthor(String username);
 }

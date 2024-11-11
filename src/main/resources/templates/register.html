@@ -1,14 +1,12 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register</title>
+<head th:replace="~{fragments/head :: head}">
+    <title>TMNF Exchange Clone | Register</title>
 </head>
 
 <body>
-    <nav th:replace="~{fragments/navbar :: navbar}"></nav>
+    <header th:replace="~{fragments/header :: header}"></header>
     <h1>Register</h1>
     <form method="post" th:action="@{/register}" th:object="${registrationRequest}">
         <label for="username">Username:</label>
@@ -25,6 +23,7 @@
     <div th:if="${error}">
         <p th:text="${error}" style="color: red;"></p>
     </div>
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
 </body>
 
 </html>

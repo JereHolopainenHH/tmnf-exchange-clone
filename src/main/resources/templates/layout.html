@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head}">
+    <title>TMNF Exchange Clone</title>
+</head>
+
+<body th:fragment="layout">
+    <header th:replace="~{fragments/header :: header}"></header>
+    <div th:insert="~{::body}"></div>
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+
+</html>

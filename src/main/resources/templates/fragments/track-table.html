@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<body>
+    <table th:fragment="table(tracks)">
+        <thead>
+            <tr>
+                <th>Track name</th>
+                <th>Author</th>
+                <th>Type</th>
+                <th>Tag</th>
+                <th>Awards</th>
+            </tr>
+            <tr th:each="track : ${tracks}">
+                <td th:text="${track.name}">Track name</td>
+                <td th:text="${track.author}">Author</td>
+                <td th:text="${track.type}">Type</td>
+                <td th:text="${track.tag}">Tag</td>
+                <td th:text="${track.awards}">Awards</td>
+            </tr>
+        </thead>
+    </table>
+</body>
+
+</html>

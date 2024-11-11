@@ -1,13 +1,9 @@
 package fi.jereholopainen.tmnf_exchange_clone.service;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,11 +16,11 @@ import org.springframework.web.multipart.MultipartFile;
 import fi.jereholopainen.tmnf_exchange_clone.exception.InvalidFileTypeException;
 import fi.jereholopainen.tmnf_exchange_clone.exception.InvalidTrackAuthorException;
 import fi.jereholopainen.tmnf_exchange_clone.exception.InvalidTrackUIDException;
-import fi.jereholopainen.tmnf_exchange_clone.exception.InvalidTmnfLoginException;
+import fi.jereholopainen.tmnf_exchange_clone.exception.TmnfLoginNotFoundException;
+import fi.jereholopainen.tmnf_exchange_clone.exception.TrackNotFoundException;
 import fi.jereholopainen.tmnf_exchange_clone.exception.UserNotFoundException;
 import fi.jereholopainen.tmnf_exchange_clone.model.AppUser;
 import fi.jereholopainen.tmnf_exchange_clone.model.Track;
-import fi.jereholopainen.tmnf_exchange_clone.repository.AppUserRepository;
 import fi.jereholopainen.tmnf_exchange_clone.repository.TrackRepository;
 
 import static fi.jereholopainen.tmnf_exchange_clone.util.FileUtils.*;
@@ -49,17 +45,15 @@ public class TrackServiceImpl implements TrackService {
         logger.info("Starting to save file: {}", file.getOriginalFilename());
 
         // Validate file type
-        if (!isValidFileType(file, ".gbx")) {
-            throw new InvalidFileTypeException("Invalid file type. Only .gbx files are allowed.");
+        if (!isValidTrackFile(file)) {
+            throw new InvalidFileTypeException("Invalid file type. Only .Challenge.Gbx files are allowed.");
         }
         // get currently authenticated user
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        AppUser user = new AppUser();
-        try {
-            user = userService.findByUsername(username);
-        } catch (UserNotFoundException e) {
-            logger.error("User not found: {}", e.getMessage());
+        AppUser user = userService.findByUsername(username);
+        if(user == null) {
+            logger.error("User not found: {}", username);
             throw new UserNotFoundException("User not found with the username: " + username);
         }
 
@@ -67,7 +61,7 @@ public class TrackServiceImpl implements TrackService {
 
         // Check if the user's tmnflogin is set
         if (user.getTmnfLogin() == null || user.getTmnfLogin().isEmpty()) {
-            throw new InvalidTmnfLoginException("Your TMNF login is not set. Please update your profile.");
+            throw new TmnfLoginNotFoundException("Your TMNF login is not set. Please update your profile.");
         }
 
         String uid = extractUidFromFile(file);
@@ -87,12 +81,13 @@ public class TrackServiceImpl implements TrackService {
 
         // Simulate the file path
         String fileName = file.getOriginalFilename();
+        String basename = getBasenameWithoutExtension(fileName);
         String simulatedFilePath = Paths.get(uploadDir, fileName).toString();
         logger.info("Simulated file path: {}", simulatedFilePath);
 
         // Save file path to database
         Track track = new Track();
-        track.setName(fileName);
+        track.setName(basename);
         track.setFilePath(simulatedFilePath);
         track.setUid(uid);
         track.setAuthor(author);
@@ -108,7 +103,23 @@ public class TrackServiceImpl implements TrackService {
         return trackRepository.findByUser(user);
     }
 
-    public List<Track> getAllTracks() {
-        return trackRepository.findAll();  
+    public List<Track> getAllTracks() { 
+        return trackRepository.findAll();
+    }
+
+    public Track getTrackById(Long id) {
+        Optional<Track> track = trackRepository.findById(id);
+        if (!track.isPresent()) {
+            throw new TrackNotFoundException("Track not found with the id: " + id);
+        }
+        return track.get();
+    }
+
+    public List<Track> getTracksByAuthor(String username){
+        AppUser user = userService.findByUsername(username);
+        if(user == null) {
+            throw new UserNotFoundException("User not found with the username: " + username);
+        }
+        return trackRepository.findByUser(user);
     }
 }

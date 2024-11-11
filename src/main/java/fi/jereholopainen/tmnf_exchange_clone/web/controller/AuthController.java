@@ -24,19 +24,23 @@ public class AuthController {
     }
 
     @GetMapping("/login")
-    public String login(@RequestParam(value = "message", required = false) String message, Model model, Authentication authentication) {
-        if(authentication != null && authentication.isAuthenticated()) {
+    public String login(@RequestParam(value = "message", required = false) String message,
+            @RequestParam(value = "error", required = false) String error, Model model, Authentication authentication) {
+        if (authentication != null && authentication.isAuthenticated()) {
             return "redirect:/home";
         }
-        if(message != null) {
+        if (message != null) {
             model.addAttribute("message", message);
+        }
+        if (error != null) {
+            model.addAttribute("error", "Invalid username or password");
         }
         return "login";
     }
 
     @GetMapping("/register")
     public String register(Model model, Authentication authentication) {
-        if(authentication != null && authentication.isAuthenticated()) {
+        if (authentication != null && authentication.isAuthenticated()) {
             return "redirect:/home";
         }
         model.addAttribute("registrationRequest", new RegistrationRequest());
@@ -44,12 +48,13 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public String register(@Valid RegistrationRequest registrationRequest, RedirectAttributes redirectAttributes, Model model) {
-        if(!registrationRequest.getPassword().equals(registrationRequest.getConfirmPassword())){
+    public String register(@Valid RegistrationRequest registrationRequest, RedirectAttributes redirectAttributes,
+            Model model) {
+        if (!registrationRequest.getPassword().equals(registrationRequest.getConfirmPassword())) {
             model.addAttribute("error", "Passwords do not match");
             return "register";
         }
-        try{
+        try {
             AppUser newUser = new AppUser();
             newUser.setUsername(registrationRequest.getUsername()); // set username
             newUser.setPasswordHash(registrationRequest.getPassword()); // set password

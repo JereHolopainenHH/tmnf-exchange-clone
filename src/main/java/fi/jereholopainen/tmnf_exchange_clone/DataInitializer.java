@@ -51,7 +51,6 @@ public class DataInitializer implements CommandLineRunner {
         // Check if admin user already exists
         if (userRepository.findByUsername("admin").isEmpty()) {
             String adminPassword = System.getenv("ADMIN_PASSWORD"); // Directly get the environment variable
-            logger.info("Admin password: {}", adminPassword);
 
             if (adminPassword != null) {
                 Role adminRole = roleRepository.findByName(ADMIN_ROLE).orElseThrow();

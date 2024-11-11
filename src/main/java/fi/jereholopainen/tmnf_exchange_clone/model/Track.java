@@ -1,5 +1,6 @@
 package fi.jereholopainen.tmnf_exchange_clone.model;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import jakarta.persistence.Column;
@@ -37,6 +38,16 @@ public class Track {
     @NotBlank(message = "Track filepath is required")
     private String filePath; // Track filepath
 
+    @NotBlank(message = "Track type is required")
+    private String type; // Track type
+
+    @NotBlank(message = "Track tag is required")
+    private String tag; // Track tag
+
+    private LocalDateTime createdAt = LocalDateTime.now(); // Track creation date
+
+    private Integer awards = 0; // Track awards
+
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @NotNull(message = "Track needs to be associated with a user")
@@ -61,7 +72,7 @@ public class Track {
         this.user = user;
     }
 
-    // getters and setters
+    // Getters and setters
     public Long getId() {
         return id;
     }
@@ -110,6 +121,22 @@ public class Track {
         this.filePath = filePath;
     }
 
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Integer getAwards() {
+        return awards;
+    }
+
+    public void setAwards(Integer awards) {
+        this.awards = awards;
+    }
+
     public AppUser getUser() {
         return user;
     }
@@ -133,8 +160,6 @@ public class Track {
     public void setReplays(List<Replay> replays) {
         this.replays = replays;
     }
-
-    
 
     
     

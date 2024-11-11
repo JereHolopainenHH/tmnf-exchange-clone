@@ -1,19 +1,17 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+<head th:replace="~{fragments/head :: head}">
+    <title>TMNF Exchange Clone | Home</title>
 </head>
 
 <body>
-    <nav th:replace="~{fragments/navbar :: navbar}"></nav>
+    <header th:replace="~{fragments/header :: header}"></header>
     <h1>hello</h1>
     <!-- Displaying the logged-in user's name -->
     <div sec:authorize="isAuthenticated()">
         <p>Hello, <span th:text="${#authentication.principal.username}"></span>!</p>
-        <p>Start <a th:href="@{/tracks/upload}">uploading tracks</a> now!</p>
+        <p>Start <a th:href="@{/trackupload}">uploading tracks</a> now!</p>
         <a th:href="@{/logout}">Logout</a>
     </div>
 
@@ -22,6 +20,7 @@
         <a th:href="@{/login}">Login</a>
     </div>
 
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
 </body>
 
 </html>

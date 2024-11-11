@@ -1,7 +1,6 @@
 package fi.jereholopainen.tmnf_exchange_clone.service;
 
 import java.util.Collection;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.security.core.GrantedAuthority;
@@ -11,7 +10,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import fi.jereholopainen.tmnf_exchange_clone.exception.UserNotFoundException;
+import fi.jereholopainen.tmnf_exchange_clone.exception.NotFoundException;
 import fi.jereholopainen.tmnf_exchange_clone.model.AppUser;
 import fi.jereholopainen.tmnf_exchange_clone.model.Role;
 
@@ -31,7 +30,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             return new org.springframework.security.core.userdetails.User(user.getUsername(),
                     user.getPasswordHash(),
                     mapRolesToAuthorities(user.getRoles()));
-        } catch (UserNotFoundException e) {
+        } catch (NotFoundException e) {
             throw new UsernameNotFoundException("User not found with username: " + username);
         }
     }

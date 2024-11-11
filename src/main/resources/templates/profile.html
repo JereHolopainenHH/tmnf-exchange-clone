@@ -1,14 +1,12 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile Management</title>
+<head th:replace="~{fragments/head :: head}">
+    <title>TMNF Exchange Clone | Profile</title>
 </head>
 
 <body>
-    <nav th:replace="~{fragments/navbar :: navbar}"></nav>
+    <header th:replace="~{fragments/header :: header}"></header>
     <h1>Profile Management</h1>
     <div th:if="${error}">
         <p th:text="${error}" style="color: red;"></p>
@@ -19,6 +17,7 @@
         <br>
         <button type="submit">Update</button>
     </form>
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
 </body>
 
 </html>
