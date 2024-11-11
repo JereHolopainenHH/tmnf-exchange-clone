@@ -18,23 +18,28 @@ import fi.jereholopainen.tmnf_exchange_clone.exception.TmnfLoginNotFoundExceptio
 import fi.jereholopainen.tmnf_exchange_clone.exception.TrackNotFoundException;
 import fi.jereholopainen.tmnf_exchange_clone.exception.UserNotFoundException;
 import fi.jereholopainen.tmnf_exchange_clone.model.AppUser;
+import fi.jereholopainen.tmnf_exchange_clone.model.Comment;
 import fi.jereholopainen.tmnf_exchange_clone.model.Track;
 import fi.jereholopainen.tmnf_exchange_clone.service.AwardService;
+import fi.jereholopainen.tmnf_exchange_clone.service.CommentService;
 import fi.jereholopainen.tmnf_exchange_clone.service.TrackService;
 import fi.jereholopainen.tmnf_exchange_clone.service.UserService;
 import fi.jereholopainen.tmnf_exchange_clone.web.dto.TrackUploadRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
+@RequestMapping("/tracks")
 public class TrackController {
 
     Logger logger = LoggerFactory.getLogger(TrackController.class);
@@ -42,26 +47,29 @@ public class TrackController {
     private final TrackService trackService;
     private final UserService userService;
     private final AwardService awardService;
+    private final CommentService commentService;
 
-    public TrackController(TrackService trackService, UserService userService, AwardService awardService) {
+    public TrackController(TrackService trackService, UserService userService, AwardService awardService, CommentService commentService) {
         this.trackService = trackService;
         this.userService = userService;
         this.awardService = awardService;
+        this.commentService = commentService;
     }
 
-    @GetMapping("/trackupload")
+    @GetMapping("/upload")
     public String showUploadForm(TrackUploadRequest trackUploadRequest, Model model) {
         model.addAttribute("trackUploadRequest", trackUploadRequest);
         return "upload";
     }
 
-    @PostMapping("/trackupload")
+    @PostMapping("/upload")
     public String uploadFile(@ModelAttribute TrackUploadRequest trackUploadRequest, Model model,
             RedirectAttributes redirectAttributes, HttpServletRequest request, HttpServletResponse response) {
         try {
             trackService.saveTrack(trackUploadRequest);
-            model.addAttribute("successes",
+            redirectAttributes.addFlashAttribute("successes",
                     "File uploaded successfully: " + trackUploadRequest.getFile().getOriginalFilename());
+            return "redirect:/tracks";
         } catch (InvalidFileTypeException | InvalidTrackAuthorException | InvalidTrackUIDException e) {
             model.addAttribute("errors", e.getMessage());
         } catch (TmnfLoginNotFoundException e) {
@@ -80,7 +88,7 @@ public class TrackController {
         return "upload";
     }
 
-    @GetMapping({ "/tracks", "/tracks/" })
+    @GetMapping({ "", "/" })
     public String showAllTracks(@RequestParam(value = "author", required = false) String author, Model model) {
         if (author != null && !author.isEmpty()) {
             List<Track> tracks = trackService.getTracksByAuthor(author);
@@ -93,7 +101,7 @@ public class TrackController {
         return "tracks";
     }
 
-    @GetMapping("/tracks/{id}")
+    @GetMapping("/{id}")
     public String showTrackById(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
         try {
             logger.info("Track ID: {}", id);
@@ -110,15 +118,15 @@ public class TrackController {
             model.addAttribute("hasAwarded", hasAwarded);
         } catch (TrackNotFoundException e) {
             redirectAttributes.addFlashAttribute("errors", e.getMessage());
-            return "redirect:/tracks";
+            return "redirect:";
         } catch (NumberFormatException | MethodArgumentTypeMismatchException e) {
             redirectAttributes.addFlashAttribute("errors", "Invalid track ID. ID must be a number.");
-            return "redirect:/tracks";
+            return "redirect:";
         }
         return "track";
     }
 
-    @PostMapping("/tracks/{id}/award")
+    @PostMapping("/{id}/award")
     public String awardTrack(@PathVariable("id") Long id, Model model, RedirectAttributes redirectAttributes) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         AppUser user = userService.findByUsername(auth.getName());
@@ -128,10 +136,10 @@ public class TrackController {
         } catch (TrackNotFoundException e) {
             redirectAttributes.addFlashAttribute("errors", e.getMessage());
         }
-        return "redirect:/tracks/" + id;
+        return "redirect:/" + id;
     }
 
-    @PostMapping("/tracks/{id}/comments")
+    @PostMapping("/{id}/comments")
     public String postComment(@PathVariable("id") Long id, @RequestParam("commentText") String commentText, Model model,
             RedirectAttributes redirectAttributes) {
 
@@ -144,6 +152,26 @@ public class TrackController {
             redirectAttributes.addFlashAttribute("errors", e.getMessage());
         }
 
-        return "redirect:/tracks/" + id;
+        return "redirect:/" + id;
+    }
+
+    @DeleteMapping("/{trackId}/comments/{commentId}/delete")
+    public String deleteComment(@PathVariable("trackId") Long trackId, @PathVariable("commentId") Long commentId, RedirectAttributes redirectAttributes) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        AppUser user = userService.findByUsername(auth.getName());
+        logger.info("Deleting comment with ID: {}", commentId);
+        try {
+
+            Comment comment = commentService.getCommentById(commentId);
+            if (comment.getUser().equals(user)) {
+                commentService.deleteComment(commentId);
+                redirectAttributes.addFlashAttribute("successes", "Comment deleted successfully.");
+            } else {
+                redirectAttributes.addFlashAttribute("errors", "You are not authorized to delete this comment.");
+            }
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errors", e.getMessage());
+        }
+        return "redirect:/tracks/" + trackId;
     }
 }

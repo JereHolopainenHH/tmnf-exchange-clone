@@ -12,7 +12,7 @@
                 Your TMNF login is not set. Please set it in your profile. <a th:href="@{/profile}"
                     class="alert-link">Profile</a>
             </div>
-            <form method="post" enctype="multipart/form-data" th:action="@{/trackupload}"
+            <form method="post" enctype="multipart/form-data" th:action="@{/tracks/upload}"
                 th:if="${user.tmnfLogin != null} or ${user.roles.?[name == 'ADMIN'].size() > 0} "
                 th:object="${trackUploadRequest}">
                 <div class="mb-3">

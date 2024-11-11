@@ -3,6 +3,7 @@
 
 <body>
     <div th:fragment="content">
+        <a href="/tracks" class="btn btn-secondary mt-4">Back</a>
         <div class="d-flex my-2">
             <h1 class="flex-grow-1" th:text="${track.name}">Tracks</h1>
             <form sec:authorization="isAuthenticated()"
@@ -25,8 +26,9 @@
                         <p class="card-text" th:text="${comment.commentText}">Comment content</p>
                         <p class="card-text"><small class="text-muted"
                                 th:text="'Posted At: ' + ${comment.postedAt}">Date</small></p>
-                        <form th:action="@{/tracks/{trackId}/comments/{commentId}/delete(trackId=${track.id}, commentId=${comment.id})}" method="post" th:if="${comment.user.username == #authentication.name}">
-                            <input type="hidden" name="_method" value="delete" />
+                        <form
+                            th:action="@{/tracks/{trackId}/comments/{commentId}/delete(trackId=${track.id}, commentId=${comment.id})}"
+                            th:method="delete" th:if="${comment.user.username == #authentication.name}">
                             <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                         </form>
                     </div>

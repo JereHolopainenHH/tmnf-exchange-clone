@@ -6,7 +6,7 @@
         <!-- Displaying the logged-in user's name -->
         <div sec:authorize="isAuthenticated()">
             <p>Hello, <span th:text="${#authentication.principal.username}"></span>!</p>
-            <p>Start <a th:href="@{/trackupload}">uploading tracks</a> now!</p>
+            <p>Start <a th:href="@{/tracks/upload}">uploading tracks</a> now!</p>
         </div>
 
         <div sec:authorize="!isAuthenticated()">
