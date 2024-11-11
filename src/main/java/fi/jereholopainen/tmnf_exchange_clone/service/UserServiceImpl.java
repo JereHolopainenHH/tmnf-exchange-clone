@@ -1,16 +1,14 @@
 package fi.jereholopainen.tmnf_exchange_clone.service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import org.apache.coyote.BadRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import fi.jereholopainen.tmnf_exchange_clone.exception.MissingInputException;
-import fi.jereholopainen.tmnf_exchange_clone.exception.NotFoundException;
 import fi.jereholopainen.tmnf_exchange_clone.exception.TmnfLoginTakenException;
 import fi.jereholopainen.tmnf_exchange_clone.exception.UsernameTakenException;
 import fi.jereholopainen.tmnf_exchange_clone.model.AppUser;
@@ -37,8 +35,22 @@ public class UserServiceImpl implements UserService {
     @Override
     public void save(AppUser user) {
         user.setPasswordHash(passwordEncoder.encode(user.getPasswordHash()));
-        Optional<Role> userRole = roleService.findByName("USER");
-        user.setRoles(Set.of(userRole.get()));
+        Role userRole = roleService.findByName("USER");
+        if (!user.getRoles().contains(userRole)) {
+            user.getRoles().add(userRole);
+        }
+        userRepository.save(user);
+    }
+
+    @Transactional
+    @Override
+    public void addAdminRole(AppUser user) {
+        Role adminRole = roleService.findByName("ADMIN");
+        if (!user.getRoles().contains(adminRole)) {
+            user.getRoles().add(adminRole);
+        } else {
+            throw new IllegalArgumentException("User is already an admin.");
+        }
         userRepository.save(user);
     }
 
@@ -61,7 +73,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updateTmnfLogin(String username, String tmnfLogin) {
         boolean tmnfLoginTaken = isTmnfLoginTaken(tmnfLogin);
-        if(tmnfLoginTaken) {
+        if (tmnfLoginTaken) {
             throw new TmnfLoginTakenException("Tmnf login " + tmnfLogin + " is already taken.");
         }
         AppUser user = userRepository.findByUsername(username).get();
@@ -73,7 +85,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updateUsername(String username, String newUsername) {
         boolean usernameTaken = isUsernameTaken(newUsername);
-        if(usernameTaken) {
+        if (usernameTaken) {
             throw new UsernameTakenException("Username " + newUsername + " is already taken.");
         }
         AppUser user = userRepository.findByUsername(username).get();
@@ -110,6 +122,11 @@ public class UserServiceImpl implements UserService {
     public boolean checkPassword(String username, String password) {
         AppUser user = userRepository.findByUsername(username).get();
         return passwordEncoder.matches(password, user.getPasswordHash());
+    }
+
+    @Override
+    public List<AppUser> getAllUsers() {
+        return userRepository.findAll();
     }
 
 }
