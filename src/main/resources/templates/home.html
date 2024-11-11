@@ -1,18 +1,21 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout('Home Page')}">
+
 <body>
     <div th:fragment="content">
-        <h1>hello</h1>
+        <h1 sec:authorize="isAuthenticated()">Hello, <span th:text="${#authentication.principal.username}"></span>!</h1>
+        <h1 sec:authorize="!isAuthenticated()">Hello !</h1>
         <!-- Displaying the logged-in user's name -->
         <div sec:authorize="isAuthenticated()">
-            <p>Hello, <span th:text="${#authentication.principal.username}"></span>!</p>
             <p>Start <a th:href="@{/tracks/upload}">uploading tracks</a> now!</p>
         </div>
 
         <div sec:authorize="!isAuthenticated()">
-            <p>Please log in.</p>
-            <a th:href="@{/login}">Login</a>
+            <p><a th:href="@{/login}">Log in</a> to start uploading tracks!</p>
         </div>
+
+        <h2>Latest Tracks</h2>
+        <table th:replace="~{fragments/track-table :: table(${tracks})}"></table>
     </div>
 </body>
 

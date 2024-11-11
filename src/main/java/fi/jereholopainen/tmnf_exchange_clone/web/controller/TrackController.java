@@ -109,7 +109,8 @@ public class TrackController {
             model.addAttribute("track", track);
 
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            if (auth == null) {
+            if (auth == null || auth.getName().equals("anonymousUser")) {
+                logger.info("User not authenticated.");
                 return "track";
             }
 
@@ -118,10 +119,10 @@ public class TrackController {
             model.addAttribute("hasAwarded", hasAwarded);
         } catch (TrackNotFoundException e) {
             redirectAttributes.addFlashAttribute("errors", e.getMessage());
-            return "redirect:";
+            return "redirect:/tracks";
         } catch (NumberFormatException | MethodArgumentTypeMismatchException e) {
             redirectAttributes.addFlashAttribute("errors", "Invalid track ID. ID must be a number.");
-            return "redirect:";
+            return "redirect:/tracks";
         }
         return "track";
     }
@@ -136,7 +137,7 @@ public class TrackController {
         } catch (TrackNotFoundException e) {
             redirectAttributes.addFlashAttribute("errors", e.getMessage());
         }
-        return "redirect:/" + id;
+        return "redirect:/tracks/" + id;
     }
 
     @PostMapping("/{id}/comments")
@@ -152,7 +153,7 @@ public class TrackController {
             redirectAttributes.addFlashAttribute("errors", e.getMessage());
         }
 
-        return "redirect:/" + id;
+        return "redirect:/tracks/" + id;
     }
 
     @DeleteMapping("/{trackId}/comments/{commentId}/delete")
