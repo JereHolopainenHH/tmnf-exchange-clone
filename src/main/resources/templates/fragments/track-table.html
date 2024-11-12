@@ -17,7 +17,9 @@
                 <td>
                     <a href="" th:href="@{/tracks/{id}(id=${track.id})}" th:text="${track.name}"></a>
                 </td>
-                <td th:text="${track.author}">Author</td>
+                <td>
+                    <a th:href="@{/tracks?author={author}(author=${track.author})}" th:text="${track.author}"></a>
+                </td>
                 <td th:text="${track.type}">Type</td>
                 <td th:text="${track.tag}">Tag</td>
                 <td th:text="${track.awards.size()}">Awards</td>

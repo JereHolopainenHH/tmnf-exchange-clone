@@ -11,4 +11,5 @@ import fi.jereholopainen.tmnf_exchange_clone.model.Track;
 public interface TrackRepository extends JpaRepository<Track, Long> {
     Optional<Track> findByUid(String uid);
     List<Track> findByUser(AppUser user);
+    List<Track> findByAuthor(String author);
 }

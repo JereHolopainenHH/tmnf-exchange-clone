@@ -12,6 +12,6 @@ public interface TrackService {
     List<Track> getAllTracks();
     List<Track> getUserTracks(AppUser user);
     Track getTrackById(Long id);
-    List<Track> getTracksByAuthor(String username);
+    List<Track> getTracksByAuthor(String author);
     void postComment(AppUser user, Long trackId, String commentText);
 }

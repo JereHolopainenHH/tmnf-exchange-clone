@@ -134,9 +134,8 @@ public class TrackServiceImpl implements TrackService {
         return track.get();
     }
 
-    public List<Track> getTracksByAuthor(String username) {
-        AppUser user = userService.findByUsername(username);
-        return trackRepository.findByUser(user);
+    public List<Track> getTracksByAuthor(String author) {
+        return trackRepository.findByAuthor(author);
     }
 
     private boolean isAdmin(AppUser user) {
